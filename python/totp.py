@@ -63,7 +63,6 @@ def hotp(K, C):
 def totp(K, TC):
     return hotp(K, int_2_str(TC))
 
-# TODO Set start time
 def get_time(slot_size):
     t = int(time.time())
     remainder = t % slot_size
@@ -86,6 +85,8 @@ def int_2_str(i):
 
 def gen_secret():
     return "%s%s" % (sha1(uuid.uuid4().bytes).hexdigest(), sha1(uuid.uuid4().bytes).hexdigest())
+
+
 print(hotp('abc','def'))
 secret = gen_secret()
 print("Secret: %s" % secret)

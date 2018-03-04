@@ -54,7 +54,7 @@ void hmac(char** res, char* K, char* m){
 
     int klen = strlen(K);
     if(klen > sha_block_size){
-        SHA1((const unsigned char *) k, klen, (unsigned char *) K);
+        SHA1((const unsigned char *) K, klen, (unsigned char *) k);
         klen = SHA_DIGEST_LENGTH;
     } else {
         k = K;
