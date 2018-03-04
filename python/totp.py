@@ -36,7 +36,7 @@ def xor(a, b):
     return c
 
 def hmac(K, m):
-
+    
     if len(K) > sha_block_size:
         k = sha1(K).digest()
     else:
@@ -86,7 +86,7 @@ def int_2_str(i):
 
 def gen_secret():
     return "%s%s" % (sha1(uuid.uuid4().bytes).hexdigest(), sha1(uuid.uuid4().bytes).hexdigest())
-
+print(hotp('abc','def'))
 secret = gen_secret()
 print("Secret: %s" % secret)
 
