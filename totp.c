@@ -1,9 +1,11 @@
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include <openssl/sha.h>
 
-#define sha_block_size 64
+#define sha_block_size SHA_CBLOCK
+
 #define OPAD "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
 #define IPAD "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm"
 
@@ -48,17 +50,20 @@ void str_xor(char** c, char* a, char* b) {
 }
 
 
-void sha1(char** output, char* input){
+void sha1(char* output, char* input){
     int lenI = strlen(input);
+    
+    unsigned char hash[SHA_DIGEST_LENGTH];
+    SHA1((const unsigned char *) input, lenI, hash);
 
-    SHA1(input, lenI, output); 
+    sprintf(output, "%s", hash);
 }
 
 void hmac(char** res, char* K, char* m){
     
 }
 
-void main(){
+int main(int argc, char* argv[]){
     char* a = "abc";
     char* b= "def";
     char* c;
@@ -71,8 +76,9 @@ void main(){
    
     printf("%s\n", a);
 
-    sha1(&c, a);
+    sha1(c, a);
     
-    printf("%02x\n", c);
+    printf("%s\n", c);
 
+    return 0;
 }
