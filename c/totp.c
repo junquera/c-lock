@@ -60,11 +60,11 @@ void hmac(char* res, char* K, char* m){
         SHA1((const unsigned char*) K, klen, (unsigned char*) k);
         klen = SHA_DIGEST_LENGTH;
     } else {
-        k = K;
+      strcpy(k, K);
     }
 
     if(klen < sha_block_size) {
-        char* aux = calloc(sha_block_size, sizeof(char));
+        char aux[sha_block_size];
 
         int s = klen;
         int i;
@@ -75,7 +75,7 @@ void hmac(char* res, char* K, char* m){
                 aux[i] = k[i - sha_block_size + s];
             }
         }
-        
+
         k = aux;
 
     }
@@ -109,6 +109,8 @@ void hmac(char* res, char* K, char* m){
     for(i = 0; i < SHA_DIGEST_LENGTH; i++)
       res[i] = hash[i];
 
+    free(o_key_pad);
+    free(i_key_pad);
 }
 
 void str_2_hex(char** output, int ilen, char* input){
