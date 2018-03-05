@@ -22,8 +22,6 @@ void str_xor(char** c, int lenA, char* a, int lenB, char* b) {
     //printf("A: %s; B: %s; Len A: %d; Len B: %d;\n", a, b, lenA, lenB);
     int lenC = max(lenA, lenB);
 
-    *c = malloc(lenC);
-
     char* aaux = malloc(lenC);
     char* baux = malloc(lenC);
 
@@ -50,18 +48,19 @@ void str_xor(char** c, int lenA, char* a, int lenB, char* b) {
 
 void hmac(char** res, char* K, char* m){
 
-    char* k = malloc(sha_block_size);
+    char* k = malloc(SHA_DIGEST_LENGTH);
 
     int klen = strlen(K);
+
     if(klen > sha_block_size){
-        SHA1((const unsigned char *) K, klen, (unsigned char *) k);
+        SHA1((const unsigned char*) K, klen, (unsigned char*) k);
         klen = SHA_DIGEST_LENGTH;
     } else {
         k = K;
     }
 
     if(klen < sha_block_size) {
-        char* aux = malloc(sha_block_size);
+        char* aux = calloc(sha_block_size, sizeof(char));
 
         int s = klen;
         int i;
@@ -75,8 +74,9 @@ void hmac(char** res, char* K, char* m){
         k = aux;
     }
 
-    char *o_key_pad, *i_key_pad;
-    unsigned char hash[SHA_DIGEST_LENGTH];
+    char hash[SHA_DIGEST_LENGTH];
+    char *o_key_pad = malloc(sha_block_size);
+    char *i_key_pad = malloc(sha_block_size);
 
     str_xor(&o_key_pad, sha_block_size, k, sha_block_size, OPAD);
     str_xor(&i_key_pad, sha_block_size, k, sha_block_size, IPAD);
@@ -89,26 +89,25 @@ void hmac(char** res, char* K, char* m){
     SHA1_Update(&ctx, i_key_pad, sha_block_size);
     SHA1_Update(&ctx, m, strlen(m));
 
-    SHA1_Final(hash, &ctx);
+    SHA1_Final((unsigned char*) hash, &ctx);
 
     // Generating SHA1(o_key_pad||SHA1(i_key_pad||m))
     SHA1_Init(&ctx);
 
     SHA1_Update(&ctx, o_key_pad, sha_block_size);
-    SHA1_Update(&ctx, hash, SHA_DIGEST_LENGTH);
+    SHA1_Update(&ctx, (unsigned char*) hash, SHA_DIGEST_LENGTH);
 
-    SHA1_Final(hash, &ctx);
+    SHA1_Final((unsigned char*) hash, &ctx);
 
     *res = (char *) hash;
 
 }
 
 void str_2_hex(char** output, int ilen, char* input){
-    *output = malloc(2*ilen);
 
     int i;
     for(i = 0; i < ilen; i++){
-        sprintf(*output + (2*i), "%02x", (unsigned char) input[i]);
+        sprintf(*output + 2*i, "%02x", input[i]);
     }
 }
 
@@ -117,11 +116,15 @@ int main(int argc, char* argv[]){
     char* a = "abc";
     char* b= "def";
     char* c;
+    char *res = malloc(2*SHA_DIGEST_LENGTH);
 
     hmac(&c, a, b);
+    int i;
+    for(i = 0; i < SHA_DIGEST_LENGTH; i++){
+        sprintf(res + 2*i, "%02x",(unsigned char) c[i]);
+    }
+    // str_2_hex(&res, SHA_DIGEST_LENGTH, c);
 
-    char *res;
-    str_2_hex(&res, SHA_DIGEST_LENGTH, c);
     printf("HMAC(%s, %s) = %s\n", a, b, res);
 
     return 0;
