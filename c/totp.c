@@ -120,14 +120,14 @@ void hotp(char* output, int klen, char* K, int clen, char* C){
 }
 
 void totp(char* output, int klen, char* K, int t){
-  char* tc = malloc(sizeof(int));
+  unsigned char tc[4];
 
-  int i;
-  for(i = 0; i < sizeof(int); i++){
-    tc[i] = ((unsigned char*) &t)[sizeof(int) - i - 1];
-  }
+  tc[0] = (unsigned char) (t >> 24) & 0xff;
+  tc[1] = (unsigned char) (t >> 16) & 0xff;
+  tc[2] = (unsigned char) (t >> 8) & 0xff;
+  tc[3] = (unsigned char) t & 0xff;
 
-  hotp(output, klen, K, 4, tc);
+  hotp(output, klen, K, 4, (char *) tc);
 }
 
 int getTime(int slotSize){
@@ -159,7 +159,7 @@ int main(int argc, char* argv[]){
     int secretLen = strlen(secret);
 
     while(1){
-      
+
       int t = getTime(30);
       totp(c, secretLen, secret, t);
 
