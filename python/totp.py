@@ -36,7 +36,7 @@ def xor(a, b):
     return c
 
 def hmac(K, m):
-    
+
     if len(K) > sha_block_size:
         k = sha1(K).digest()
     else:
@@ -72,26 +72,26 @@ def get_time(slot_size):
     return t
 
 def int_2_str(i):
-    print(i)
-    a = i >> 3*8
-    b = (i >> 2*8) - (a << 8)
-    c = (i >> 8) - (a << 2*8) - (b << 8)
-    d = i - (a << 3*8) - (b << 2*8) - (c << 8)
-    print(a)
-    print(b)
-    print(c)
-    print(d)
+
+    a = (i & 0xff000000) >> 24
+    b = (i  & 0x00ff0000) >> 16
+    c = (i & 0x0000ff00) >> 8
+    d = i & 0x000000ff
+
     return "%c%c%c%c" % (a, b, c, d)
 
 def gen_secret():
     return "%s%s" % (sha1(uuid.uuid4().bytes).hexdigest(), sha1(uuid.uuid4().bytes).hexdigest())
 
 
-print(hotp('abc','def'))
+# print(hotp('abc','def'))
 secret = gen_secret()
-print("Secret: %s" % secret)
+secret = '0c76f310c1f0bde009dd860a5c09cb118e8c8caa26aa542522b824c7d3296c3331b473553e29c9e4'
+# print("Secret: %s" % secret)
 
 while 1:
     tc = get_time(30)
+    # print("Secret: %s" % secret)
+    # print("T: %d" % tc)
     print(totp(secret, tc))
     time.sleep(5)
