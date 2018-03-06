@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import time
 from hashlib import sha1
 import uuid
 
@@ -54,7 +53,7 @@ def hmac(K, m):
     b = sha1(encode(o_key_pad))
     b.update(encode(a.digest()))
 
-    return b.hexdigest()
+    return b.digest()
 
 
 def hotp(K, C):
@@ -63,35 +62,15 @@ def hotp(K, C):
 def totp(K, TC):
     return hotp(K, int_2_str(TC))
 
-def get_time(slot_size):
-    t = int(time.time())
-    remainder = t % slot_size
-
-    t -= remainder
-
-    return t
 
 def int_2_str(i):
 
-    a = (i & 0xff000000) >> 24
-    b = (i  & 0x00ff0000) >> 16
-    c = (i & 0x0000ff00) >> 8
-    d = i & 0x000000ff
+    a = (i >> 24) & 0xff
+    b = (i >> 16)  & 0xff
+    c = (i >> 8) & 0xff
+    d = i & 0xff
 
     return "%c%c%c%c" % (a, b, c, d)
 
 def gen_secret():
     return "%s%s" % (sha1(uuid.uuid4().bytes).hexdigest(), sha1(uuid.uuid4().bytes).hexdigest())
-
-
-# print(hotp('abc','def'))
-secret = gen_secret()
-secret = '0c76f310c1f0bde009dd860a5c09cb118e8c8caa26aa542522b824c7d3296c3331b473553e29c9e4'
-# print("Secret: %s" % secret)
-
-while 1:
-    tc = get_time(30)
-    # print("Secret: %s" % secret)
-    # print("T: %d" % tc)
-    print(totp(secret, tc))
-    time.sleep(5)
