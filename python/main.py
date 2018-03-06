@@ -142,22 +142,36 @@ def manage_socket(s, next):
     pass
 
 import socket
+import threading
 def open_ports(ttp):
 
-    values = ttp.get_actual()
+    ss = []
+    try:
+        ttp_next = ttp.next()
+        t0 = time.time()
 
-    n = values.next()
-    while n:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        values = ttp.get_actual()
 
-        s.bind(('0.0.0.0', n))
-        s.listen(1)
-        s.accept()
-        s.close()
         n = values.next()
-        print("Next %d" % n)
-
-    print("Opening port %d" % ttp.get_destination())
+        while n and time.time() - t0 < ttp_next:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            ss.append(s)
+            s.bind(('0.0.0.0', n))
+            s.listen(1)
+            s.settimeout(ttp_next - (time.time() - t0))
+            s.accept()
+            s.close()
+            n = values.next()
+            print("Next %d" % n)
+        print("Opening port %d" % ttp.get_destination())
+    except Exception as e:
+        print(e)
+        for s in ss:
+            try:
+                s.close()
+            except:
+                pass
+        pass
 
 # TODO https://github.com/ldx/python-iptables
 # TODO https://docs.python.org/3/library/argparse.html
@@ -174,7 +188,6 @@ def main():
     while 1:
         print(ports)
         open_ports(ports)
-        time.sleep(ports.next())
 
 
 if __name__ == '__main__':

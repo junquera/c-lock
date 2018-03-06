@@ -176,6 +176,7 @@ def toc_ports(ttp):
                 print("End")
                 return
             retry += 1
+            time.sleep(0.1)
             continue
         retry = 0
         n = values.next()
