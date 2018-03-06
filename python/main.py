@@ -4,31 +4,55 @@ import time
 def bytes2int(b):
     return int.from_bytes(b, byteorder='big', signed=False)
 
-# 1 < n < 10
-def gen_ports(val, n=3, forbidden=[]):
-    values = []
-    for i in range(n):
-        aux = bytes2int(val[2*i:(2*i)+2])
-        if aux < 1024:
-            aux += 1024
-        while aux in forbidden or aux in values:
-            aux+=1
-        values.append(aux)
-    return values
-
 # TODO Threading & sockets!
 # import threading, socket
 
+class Last(Exception):
+    pass
+
+class PortList():
+
+    def __init__(self, l):
+        self._l = l
+        self.actual = 0
+
+    def next(self):
+
+        if len(self._l) <= self.actual:
+            # raise Last()
+            return 0
+
+        n = self._l[self.actual]
+        self.actual += 1
+        return n
+
+    def prev(self):
+
+        if len(0 <= self.actual):
+            raise Last()
+
+        n = self._l[self.actual]
+        self.actual -= 1
+        return n
+
+    def get_values(self):
+        return self._l
+
+    def reset(self):
+        self.actual = 0
+
+
 class TocTocPorts():
 
-    def __init__(self, secret, n_ports=4, slot=30, forbidden=[]):
+    def __init__(self, secret, slot=30, n_ports=4, destination=22, forbidden=[]):
 
         self._secret = secret
         self._slot = slot
         self._forbidden = forbidden
+        self._destination = destination
 
         if n_ports > 20:
-            raise "Error, max ports: %d" % 20
+            raise Exception("Error, max ports: %d" % 20)
 
         self._n_ports = n_ports
 
@@ -37,13 +61,30 @@ class TocTocPorts():
         self._p = ports['p']
         self._a = ports['a']
         self._n = ports['n']
-
         # time.sleep(ns)
+
+    # 1 < n < 10
+    def gen_ports(self, val):
+        values = []
+        for i in range(self._n_ports):
+            aux = bytes2int(val[2*i:(2*i)+2])
+            if aux < 1024:
+                aux += 1024
+            while aux in self._forbidden or aux in values or aux == self._destination:
+                aux += 1
+            values.append(aux)
+        return values
+
+
+    def get_slot(self):
+        return self._slot
+
+    def get_destination(self):
+        return self._destination
 
     def next(self):
         t = int(time.time())
         remainder = t % self._slot
-
         return self._slot - remainder
 
 
@@ -63,20 +104,20 @@ class TocTocPorts():
         vala = totp.totp(self._secret, tc)
         valn = totp.totp(self._secret, tcn)
 
-        portsp = gen_ports(valp, n=self._n_ports, forbidden=self._forbidden)
-        portsa = gen_ports(vala, n=self._n_ports, forbidden=self._forbidden)
-        portsn = gen_ports(valn, n=self._n_ports, forbidden=self._forbidden)
+        portsp = self.gen_ports(valp)
+        portsa = self.gen_ports(vala)
+        portsn = self.gen_ports(valn)
 
-        return {'p': portsp, 'a': portsa, 'n': portsn}
+        return {'p': PortList(portsp), 'a': PortList(portsa), 'n': PortList(portsn)}
 
     def get_prev(self):
-        return self.get_all['p']
+        return self.get_all()['p']
 
     def get_actual(self):
-        return self.get_all['a']
+        return self.get_all()['a']
 
     def get_next(self):
-        return self.get_all['n']
+        return self.get_all()['n']
 
     def __str__(self):
         res = ''
@@ -86,9 +127,9 @@ class TocTocPorts():
         res += "\n"
 
         ports = self.get_all()
-        p = ports['p']
-        a = ports['a']
-        n = ports['n']
+        p = ports['p'].get_values()
+        a = ports['a'].get_values()
+        n = ports['n'].get_values()
 
         for port in range(len(p)):
             res += ("%d\t%d\t\t%d\t\t%d\n" % (port, p[port], a[port], n[port]))
@@ -96,6 +137,27 @@ class TocTocPorts():
         res += "\n"
 
         return res
+
+def manage_socket(s, next):
+    pass
+
+import socket
+def open_ports(ttp):
+
+    values = ttp.get_actual()
+
+    n = values.next()
+    while n:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        s.bind(('0.0.0.0', n))
+        s.listen(1)
+        s.accept()
+        s.close()
+        n = values.next()
+        print("Next %d" % n)
+
+    print("Opening port %d" % ttp.get_destination())
 
 # TODO https://github.com/ldx/python-iptables
 # TODO https://docs.python.org/3/library/argparse.html
@@ -107,16 +169,12 @@ def main():
 
     print("Secret: %s" % secret)
 
-    ports = TocTocPorts(secret, slot)
-
-    print(ports)
-
-    time.sleep(ports.next())
+    ports = TocTocPorts(secret)
 
     while 1:
         print(ports)
-
-        time.sleep(slot)
+        open_ports(ports)
+        time.sleep(ports.next())
 
 
 if __name__ == '__main__':
