@@ -152,20 +152,33 @@ def open_ports(ttp):
 
         values = ttp.get_actual()
 
+        '''
+        TODO
+        1.- Abrir todos los puertos.
+        2.- Al escuchar recibir petición en puerto n, abrir puerto n+1 a esa IP.
+            2.1.- Abrir cada puerto (excepto el primero) durante 2 segundos.
+        3.- Al terminar, abrir (también durante 2 segundos) el puerto final a la IP.
+        4.- Si antes de este proceso se termina ttp.next, cerrar todo y volver a empezar.
+        '''
+
         n = values.next()
         while n and time.time() - t0 < ttp_next:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             ss.append(s)
             s.bind(('0.0.0.0', n))
             s.listen(1)
+
+            # TODO ASYNC BLOCK?
             s.settimeout(ttp_next - (time.time() - t0))
             s.accept()
             s.close()
+            # ASYNC BLOCK
+
             n = values.next()
             print("Next %d" % n)
+
         print("Opening port %d" % ttp.get_destination())
     except Exception as e:
-        print(e)
         for s in ss:
             try:
                 s.close()
