@@ -1,6 +1,5 @@
 import totp
 import time
-import codecs
 
 def get_time(slot_size):
     t = int(time.time())

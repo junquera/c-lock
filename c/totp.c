@@ -26,8 +26,8 @@ void str_xor(char* c, int lenA, char* a, int lenB, char* b) {
     //printf("A: %s; B: %s; Len A: %d; Len B: %d;\n", a, b, lenA, lenB);
     int lenC = max(lenA, lenB);
 
-    char* aaux = malloc(lenC);
-    char* baux = malloc(lenC);
+    char* aaux = malloc(lenC * sizeof(char));
+    char* baux = malloc(lenC * sizeof(char));
 
     int i;
     for(i = lenC; i >= 0; i--){
@@ -56,7 +56,7 @@ void str_xor(char* c, int lenA, char* a, int lenB, char* b) {
 
 void hmac(char* res, int klen, char* K, int mlen, char* m){
 
-    char* k = malloc(SHA_DIGEST_LENGTH);
+    char* k = malloc(SHA_DIGEST_LENGTH*sizeof(char));
 
     if(klen > sha_block_size){
         SHA1((const unsigned char*) K, klen, (unsigned char*) k);
@@ -83,8 +83,8 @@ void hmac(char* res, int klen, char* K, int mlen, char* m){
     }
 
     char hash[SHA_DIGEST_LENGTH];
-    char *o_key_pad = malloc(sha_block_size);
-    char *i_key_pad = malloc(sha_block_size);
+    char *o_key_pad = malloc(sha_block_size*sizeof(char));
+    char *i_key_pad = malloc(sha_block_size*sizeof(char));
 
     str_xor(o_key_pad, sha_block_size, k, sha_block_size, OPAD);
     str_xor(i_key_pad, sha_block_size, k, sha_block_size, IPAD);
@@ -148,13 +148,11 @@ void str2hex(char** output, int ilen, char* input){
 }
 
 int main(int argc, char* argv[]){
-
-    // char* a = "abc";
-    // char* b = "def";
-    char* c = malloc(SHA_DIGEST_LENGTH);
-    char *res = malloc(2*SHA_DIGEST_LENGTH);
-
     char* secret = "0c76f310c1f0bde009dd860a5c09cb118e8c8caa26aa542522b824c7d3296c3331b473553e29c9e4";
+    
+    char* c = malloc(SHA_DIGEST_LENGTH * sizeof(char));
+    char *res = malloc(2*SHA_DIGEST_LENGTH * sizeof(char));
+
 
     int secretLen = strlen(secret);
 
@@ -163,12 +161,7 @@ int main(int argc, char* argv[]){
       int t = getTime(30);
       totp(c, secretLen, secret, t);
 
-      int i;
-      for(i = 0; i < SHA_DIGEST_LENGTH; i++){
-        sprintf(res + 2*i, "%02x",(unsigned char) c[i]);
-      }
-
-      // str2hex(&res, SHA_DIGEST_LENGTH, c);
+      str2hex(&res, SHA_DIGEST_LENGTH, c);
 
       printf("%s\n", res);
       sleep(5);
