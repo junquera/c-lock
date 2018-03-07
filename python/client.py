@@ -95,31 +95,29 @@ class TocTocPorts():
         return t - remainder
 
     def get_all(self):
-        return {'p': self.get_prev(), 'a': self.get_actual(), 'n': self.get_next()}
 
-    def get_prev(self):
+        tc = self.last()
+        tcp = tc - self._slot
+        tcn = tc + self._slot
 
-        tcp = self.last() - self._slot
         valp = totp.totp(self._secret, tcp)
-        portsp = self.gen_ports(valp)
-
-        return PortList(portsp)
-
-    def get_actual(self):
-
-        tca = self.last()
-        vala = totp.totp(self._secret, tca)
-        portsa = self.gen_ports(vala)
-
-        return PortList(portsa)
-
-    def get_next(self):
-        
-        tcn = self.last() + self._slot
+        vala = totp.totp(self._secret, tc)
         valn = totp.totp(self._secret, tcn)
+
+        portsp = self.gen_ports(valp)
+        portsa = self.gen_ports(vala)
         portsn = self.gen_ports(valn)
 
-        return portsn
+        return {'p': PortList(portsp), 'a': PortList(portsa), 'n': PortList(portsn)}
+
+    def get_prev(self):
+        return self.get_all()['p']
+
+    def get_actual(self):
+        return self.get_all()['a']
+
+    def get_next(self):
+        return self.get_all()['n']
 
     def __str__(self):
         res = ''
@@ -144,49 +142,49 @@ def manage_socket(s, next):
     pass
 
 import socket
-import threading
 def open_ports(ttp):
 
-    ss = []
-    try:
-        ttp_next = ttp.next()
-        t0 = time.time()
+    values = ttp.get_actual()
 
-        values = ttp.get_actual()
+    n = values.next()
+    while n:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        '''
-        TODO
-        1.- Abrir todos los puertos.
-        2.- Al escuchar recibir petición en puerto n, abrir puerto n+1 a esa IP.
-            2.1.- Abrir cada puerto (excepto el primero) durante 2 segundos.
-        3.- Al terminar, abrir (también durante 2 segundos) el puerto final a la IP.
-        4.- Si antes de este proceso se termina ttp.next, cerrar todo y volver a empezar.
-        '''
-
+        s.bind(('0.0.0.0', n))
+        s.listen(1)
+        s.accept()
+        s.close()
         n = values.next()
-        while n and time.time() - t0 < ttp_next:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ss.append(s)
-            s.bind(('0.0.0.0', n))
-            s.listen(1)
+        print("Next %d" % n)
 
-            # TODO ASYNC BLOCK?
-            s.settimeout(ttp_next - (time.time() - t0))
-            s.accept()
+    print("Opening port %d" % ttp.get_destination())
+
+def toc_ports(ttp):
+
+    values = ttp.get_actual()
+
+    retry = 0
+    n = values.next()
+    while n:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        try:
+            s.connect(('localhost', n))
             s.close()
-            # ASYNC BLOCK
+        except:
+            if retry > 3:
+                print("End")
+                return
+            retry += 1
+            time.sleep(0.1)
+            continue
+        retry = 0
+        n = values.next()
+        print("Next %d" % n)
 
-            n = values.next()
-            print("Next %d" % n)
+    print("Opening port %d" % ttp.get_destination())
 
-        print("Opening port %d" % ttp.get_destination())
-    except Exception as e:
-        for s in ss:
-            try:
-                s.close()
-            except:
-                pass
-        pass
+import sys
 
 # TODO https://github.com/ldx/python-iptables
 # TODO https://docs.python.org/3/library/argparse.html
@@ -194,16 +192,14 @@ def main():
 
     slot = 30
 
-    secret = totp.gen_secret()
+    secret = sys.argv[1]
 
     print("Secret: %s" % secret)
 
     ports = TocTocPorts(secret)
 
-    while 1:
-        print(ports)
-        open_ports(ports)
-
+    print(ports)
+    toc_ports(ports)
 
 if __name__ == '__main__':
     main()
