@@ -147,86 +147,51 @@ class TocTocPorts():
 def manage_socket(s, next):
     pass
 
-import socket
+import socket # TODO Reemplazar por https://docs.python.org/2/library/asyncore.html ? Por el método accept
 import threading
-
-def open_ports(ttp):
-
-    ss = []
-    try:
-        ttp_next = ttp.next()
-        t0 = time.time()
-
-        values = ttp.get_actual()
-
-        '''
-        TODO
-        1.- Abrir todos los puertos.
-        2.- Al escuchar recibir petición en puerto n, abrir puerto n+1 a esa IP.
-            2.1.- Abrir cada puerto (excepto el primero) durante 2 segundos.
-        3.- Al terminar, abrir (también durante 2 segundos) el puerto final a la IP.
-        4.- Si antes de este proceso se termina ttp.next, cerrar todo y volver a empezar.
-        '''
-
-        n = values.next()
-        while n and time.time() - t0 < ttp_next:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ss.append(s)
-            s.bind(('0.0.0.0', n))
-            s.listen(1)
-
-            # TODO ASYNC BLOCK?
-            s.settimeout(ttp_next - (time.time() - t0))
-            s.accept()
-            s.close()
-            # ASYNC BLOCK
-
-            n = values.next()
-            print("Next %d" % n)
-
-        print("Opening port %d" % ttp.get_destination())
-    except Exception as e:
-        for s in ss:
-            try:
-                s.close()
-            except:
-                pass
-        pass
-
-import asyncio
 
 class PortManager():
 
     def __init__(self, ttp):
         self._ttp = ttp
         self._sockets = []
-        self.open()
+
+    def wait_and_listen(self, s):
+        # TODO ASYNC - asyncio
+        p = s.getsockname()[1]
+        while 1:
+            try:
+                sock, addr = s.accept()
+                print("New connection to %d from %s" %(p, addr[1]))
+                sock.close()
+            except:
+                pass
 
     def open(self):
         self._ports = self._ttp.get_actual()
         print("Abriendo")
+
         for port in self._ports.get_values():
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._sockets.append(s)
             print("Opening %d" % port)
             s.bind(('0.0.0.0', port))
             s.listen(1)
+            threading.Thread(target=self.wait_and_listen, args=(s,)).start()
 
-            # TODO ASYNC - asyncio
-            p = s.getsockname()[1]
-            while 1:
-                sock, addr = s.accept()
-                print("New connection to %d from %s" %(p, addr))
-                sock.close()
-
+    def close_socket(self, s):
+        try:
+            s.close()
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(s.getsockname())
+        except:
+            pass
     def close(self):
+
+        print("Cerrando")
         while len(self._sockets):
             s = self._sockets.pop()
-            print("Closing %d" % s.port)
-            try:
-                s.close()
-            except:
-                pass
+            print("Closing %d" % s.getsockname()[1])
+            self.close_socket(s)
 
     def reset(self):
         self.close()
@@ -237,13 +202,15 @@ class FirewallManager():
 
 # TODO https://github.com/ldx/python-iptables
 # TODO https://docs.python.org/3/library/argparse.html
-# TODO https://twistedmatrix.com/trac/
+# TODO https://twistedmatrix.com/trac/ || https://docs.python.org/3/library/signal.html
 def main():
 
     slot = 30
 
     secret = totp.gen_secret()
 
+    # TODO Delete after debug
+    secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799'
     print("Secret: %s" % secret)
 
     ttp = TocTocPorts(secret)
@@ -254,8 +221,10 @@ def main():
 
     while 1:
         pm.open()
+        print("Abierto")
         time.sleep(ttp.next())
         pm.close()
+        print("Cerrado")
 
 if __name__ == '__main__':
     main()

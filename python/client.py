@@ -167,7 +167,7 @@ def toc_ports(ttp):
     n = values.next()
     while n:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+        s.settimeout(1)
         try:
             s.connect(('localhost', n))
             s.close()
@@ -192,7 +192,7 @@ def main():
 
     slot = 30
 
-    secret = sys.argv[1]
+    secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799' # sys.argv[1]
 
     print("Secret: %s" % secret)
 
