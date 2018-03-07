@@ -95,29 +95,31 @@ class TocTocPorts():
         return t - remainder
 
     def get_all(self):
-
-        tc = self.last()
-        tcp = tc - self._slot
-        tcn = tc + self._slot
-
-        valp = totp.totp(self._secret, tcp)
-        vala = totp.totp(self._secret, tc)
-        valn = totp.totp(self._secret, tcn)
-
-        portsp = self.gen_ports(valp)
-        portsa = self.gen_ports(vala)
-        portsn = self.gen_ports(valn)
-
-        return {'p': PortList(portsp), 'a': PortList(portsa), 'n': PortList(portsn)}
+        return {'p': self.get_prev(), 'a': self.get_actual(), 'n': self.get_next()}
 
     def get_prev(self):
-        return self.get_all()['p']
+
+        tcp = self.last() - self._slot
+        valp = totp.totp(self._secret, tcp)
+        portsp = self.gen_ports(valp)
+
+        return PortList(portsp)
 
     def get_actual(self):
-        return self.get_all()['a']
+
+        tca = self.last()
+        vala = totp.totp(self._secret, tca)
+        portsa = self.gen_ports(vala)
+
+        return PortList(portsa)
 
     def get_next(self):
-        return self.get_all()['n']
+        
+        tcn = self.last() + self._slot
+        valn = totp.totp(self._secret, tcn)
+        portsn = self.gen_ports(valn)
+
+        return portsn
 
     def __str__(self):
         res = ''
