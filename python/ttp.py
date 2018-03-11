@@ -3,6 +3,9 @@ import totp
 import time
 import uuid
 import threading
+import logging
+
+log = logging.getLogger(__name__)
 
 class PortList():
 
@@ -27,7 +30,7 @@ class PortList():
     def prev(self):
 
         if len(0 <= self._actual):
-            raise Last()
+            return -1
 
         n = self._l[self._actual]
         self._actual -= 1
@@ -65,6 +68,13 @@ class TocTocPorts():
         values = []
         for i in range(self._n_ports):
             aux = totp.bytes2int(val[2*i:(2*i)+2])
+
+            min_port = (2 << 10) + 1
+            max_port = 2 << 13
+
+            # Value between min_port and max_port, from 2^16 values
+            aux = int(min_port + (max_port - min_port) * float(aux) / (2 << 16))
+
             if aux < 1024:
                 aux += 1024
             while aux in self._forbidden or aux in values or aux == self._destination:
@@ -116,7 +126,7 @@ class TocTocPorts():
         valn = totp.totp(self._secret, tcn)
         portsn = self.gen_ports(valn)
 
-        return portsn
+        return PortList(portsn)
 
     def __str__(self):
         res = ''
@@ -151,7 +161,9 @@ class TocTocPortsWorker(ProcWorker):
 
         while self.stay_running:
             self._o.put(Event(self.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
-            time.sleep(self._ttp.next())
+            next_t = self._ttp.next()
+            log.debug("Next slot in %ds" % next_t)
+            time.sleep(next_t)
 
 
     def process_evt(self, evt):

@@ -1,5 +1,10 @@
 from ttp import TocTocPorts
 import socket
+import time
+
+import logging
+
+log = logging.getLogger(__name__)
 
 def toc_ports(ttp):
 
@@ -15,25 +20,25 @@ def toc_ports(ttp):
             s.close()
         except:
             if retry > 3:
-                print("End")
+                log.error("Max retries! Port %d doesnt work" % n)
                 return
             retry += 1
-            time.sleep(0.1)
+            time.sleep(retry * 0.1)
             continue
         retry = 0
         n = values.next()
-        print("Next %d" % n)
+        log.debug("Next %d" % n)
 
-    print("Opening port %d" % ttp.get_destination())
+    log.debug("Opening port %d" % ttp.get_destination())
 
 def main():
 
     secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799'
 
-    print("Secret: %s" % secret)
+    log.debug("Secret: %s" % secret)
 
     ports = TocTocPorts(secret)
-
+    print(ports)
     toc_ports(ports)
 
 if __name__ == '__main__':

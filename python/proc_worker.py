@@ -1,5 +1,16 @@
 import threading
 import uuid
+import logging
+
+log = logging.getLogger(__name__)
+
+def bypass(fa, fb):
+
+    def mix(*args, **kwargs):
+        fa(*args, **kwargs)
+        fb(*args, **kwargs)
+
+    return mix
 
 class ProcWorker(threading.Thread):
 
@@ -20,6 +31,7 @@ class ProcWorker(threading.Thread):
 
     def process_evt(self, evt):
         if evt.get_id() == self.END:
+            log.debug("Received close signal")
             self.stay_running = False
         pass
 

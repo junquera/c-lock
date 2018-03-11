@@ -1,4 +1,5 @@
 # toc-toc-ssh
+
 Ssh port knocking based in TOTP
 
 ## TODO
@@ -6,3 +7,13 @@ Ssh port knocking based in TOTP
 - [ ] Write this document!
 
 - [ ] Make it work with previous/next slots for clock issues.
+
+- [ ] Al capturar error fatal, limpiar las reglas y dejar abierto el puerto de destino
+
+- [ ] El valor del último puerto tiene que estar en el manejador del resto de módulos, en TocTocPorts tiene que entrar sólo como un puerto prohibido.
+
+- [ ] Best practices in logging: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+
+- [ ] See YAML or JSON config file: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+
+- [ ] Cuando un puerto está ocupado: ¿Esperamos al siguiente slot o matamos el proceso?
