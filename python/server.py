@@ -165,12 +165,11 @@ class KnockablePort():
 
 class PortManager():
 
-    def __init__(self, ttp):
-        self._ttp = ttp
+    def __init__(self):
         self._sockets = []
 
     def wait_and_listen(self, kp):
-        # TODO ASYNC - asyncio
+
         s = kp.get_socket()
         p = s.getsockname()
         next_port = kp.get_next_port()
@@ -183,9 +182,14 @@ class PortManager():
             except:
                 pass
 
+    def notify_first_port(self, p):
+        print("First port: %d" % p)
+
     def notify_connection(self, p, addr, next_port):
-        # TODO Open firewall some seconds. If next_port == 0, open result
-        print("New connection to %d from %s, next step %d" %(p[1], addr[0], next_port))
+        if next_port:
+            print("New connection to %d from %s, next step %d" %(p[1], addr[0], next_port))
+        else:
+            print("New connection to %d from %s, open the result!" % (p[1], addr[0]))
 
     def open_socket(self, port):
         try:
@@ -198,19 +202,17 @@ class PortManager():
                 print("Error. El puerto %d ya está siendo utilizado por otro proceso" % port)
             raise e
 
-    def open(self):
-        self._ports = self._ttp.get_actual()
-        print("Abriendo")
+    def open(self, port_list):
 
-        n = self._ports.next()
+        n = port_list.next()
 
         if n:
-            # TODO Open the port until ttp.timeout
+            self.notify_first_port(n)
             pass
 
         while n:
             port = n
-            n = self._ports.next()
+            n = port_list.next()
 
             print("Opening %d" % port)
 
@@ -240,18 +242,51 @@ class PortManager():
         self.close()
         self.open()
 
+class ProcWorker(threading.Thread):
+
+    def __init__(self, i_q, o_q):
+        super(ProcWorker, self).__init__()
+        self._i = i_q
+        self._o = o_q
+        self._instance = instance
+        self.start()
+
+    def run(self):
+
+        while 1:
+            evt = self._i.get(True)
+            self.process_evt(evt)
+
+    def process_evt(self, evt):
+        pass
+
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Event_Objects_between_Threads.php
-class PortManagerWorker(threading.Thread):
-    pass
+class PortManagerWorker(ProcWorker):
 
+    def __init__(self, i_q, o_q, pm):
+        super(PortManagerWorker, self).__init__(i_q, o_q)
+        self._pm = pm
+        self._pm.notify_connection = self.notify_connection
+        self._pm.notify_first_port = self.notify_first_port
+
+    def notify_first_port(self, p):
+        print("First port: %d" % p)
+
+    def notify_connection(self, p, addr, next_port):
+        if next_port:
+            print("New connection to %d from %s, next step %d" %(p[1], addr[0], next_port))
+        else:
+            print("New connection to %d from %s, open the result!" % (p[1], addr[0]))
+
+    def process_evt(self, evt):
+        pass
 
 class FirewallManager():
+    # TODO https://github.com/ldx/python-iptables
     pass
 
-# TODO https://github.com/ldx/python-iptables
 # TODO https://docs.python.org/3/library/argparse.html
-# TODO https://twistedmatrix.com/trac/ || https://docs.python.org/3/library/signal.html
 def main():
 
     slot = 30
@@ -264,12 +299,12 @@ def main():
 
     ttp = TocTocPorts(secret)
 
-    pm = PortManager(ttp)
+    pm = PortManager()
 
     # fwm = FirewallManager()
 
     while 1:
-        pm.open()
+        pm.open(ttp.get_actual())
         print("Abierto")
         time.sleep(ttp.next())
         pm.close()
