@@ -32,9 +32,12 @@ class PortManager():
             try:
                 sock, addr = s.accept()
                 self.notify_connection(p, addr, next_port)
-                sock.close()
+                self.handle_connection(sock, addr)
             except:
                 pass
+
+    def handle_connection(self, sock, addr):
+        sock.close()
 
     def notify_first_port(self, p):
         print("First port: %d" % p)
@@ -101,30 +104,37 @@ class PortManager():
         self.open()
 
 
-# TODO Bypasser with decorator
+def bypass(fa, fb):
+
+    def mix(*args, **kwargs):
+        fa(*args, **kwargs)
+        fb(*args, **kwargs)
+
+    return mix
 
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Event_Objects_between_Threads.php
 class PortManagerWorker(ProcWorker):
 
     NEW_CONNECTION = uuid.uuid4().bytes
-    CLOSING_SOCKET = uuid_uuid4().bytes
+    CLOSING_SOCKET = uuid.uuid4().bytes
     FIRST_PORT = uuid.uuid4().bytes
     LAST_PORT = uuid.uuid4().bytes
 
     def __init__(self, i_q, o_q, pm=PortManager()):
         super(PortManagerWorker, self).__init__(i_q, o_q)
+        
         self._pm = pm
 
-        self._pm.notify_socket_closed = self.notify_socket_closed
-        self._pm.notify_connection = self.notify_connection
-        self._pm.notify_first_port = self.notify_first_port
+        self._pm.notify_socket_closed = bypass(self._pm.notify_socket_closed, self.notify_socket_closed)
+        self._pm.notify_connection = bypass(self._pm.notify_connection, self.notify_connection)
+        self._pm.notify_first_port = bypass(self._pm.notify_first_port, self.notify_first_port)
 
     def notify_first_port(self, p):
         self._o.put(Event(self.FIRST_PORT, {'port': p}))
 
     def notify_socket_closed(self, s_addr):
-        self._o.put(Event(self.CLOSING_SOCKET), {'port': s_addr[1]})
+        self._o.put(Event(self.CLOSING_SOCKET, {'port': s_addr[1]}))
 
     def notify_connection(self, p, addr, next_port):
         if next_port:

@@ -2,7 +2,6 @@ from proc_worker import ProcWorker, Event
 import totp
 import time
 import uuid
-from common import *
 import threading
 
 class PortList():
@@ -65,7 +64,7 @@ class TocTocPorts():
     def gen_ports(self, val):
         values = []
         for i in range(self._n_ports):
-            aux = bytes2int(val[2*i:(2*i)+2])
+            aux = totp.bytes2int(val[2*i:(2*i)+2])
             if aux < 1024:
                 aux += 1024
             while aux in self._forbidden or aux in values or aux == self._destination:
