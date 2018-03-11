@@ -14,6 +14,7 @@ def bypass(fa, fb):
 
 class ProcWorker(threading.Thread):
 
+    NONE = -1
     END = uuid.uuid4().bytes
 
     stay_running = True
@@ -27,12 +28,15 @@ class ProcWorker(threading.Thread):
     def run(self):
         while self.stay_running:
             evt = self._i.get(True)
-            self.process_evt(evt)
+            if evt:
+                self.process_evt(evt)
 
     def process_evt(self, evt):
         if evt.get_id() == self.END:
             log.debug("Received close signal")
             self.stay_running = False
+            self._i.put(None)
+
         pass
 
 

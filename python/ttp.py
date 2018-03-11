@@ -165,6 +165,7 @@ class TocTocPortsWorker(ProcWorker):
             log.debug("Next slot in %ds" % next_t)
             time.sleep(next_t)
 
+        log.debug("Fin del thread de TocTocPorts")
 
     def process_evt(self, evt):
 

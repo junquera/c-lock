@@ -16,4 +16,8 @@ Ssh port knocking based in TOTP
 
 - [ ] See YAML or JSON config file: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 
+- [ ] Cerrar todos los thread
+
 - [ ] Cuando un puerto está ocupado: ¿Esperamos al siguiente slot o matamos el proceso?
+
+- [ ] Intentar mejorar todos los hilos (en especial, los de sockets)

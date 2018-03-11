@@ -28,21 +28,23 @@ class PortManager():
         self._sockets = []
         self._threads = []
 
-    def wait_and_listen(self, kp):
+    def wait_and_listen(self, kp, evt):
 
         s = kp.get_socket()
         p = s.getsockname()
         next_port = kp.get_next_port()
 
         # TODO Ver por qué no termina el hilo...
-        while 1:
+        while not evt.is_set():
             try:
                 sock, addr = s.accept()
+
                 self.notify_connection(p, addr, next_port)
                 self.handle_connection(sock, addr)
             except Exception as e:
-                log.debug("Thread del socket %s" % str(p))
-                break
+                self.notify_error_opening_socket()
+
+        log.debug("Fin del thread del socket %s" % str(p))
 
     def handle_connection(self, sock, addr):
         sock.close()
@@ -88,8 +90,9 @@ class PortManager():
             if s:
                 kp = KnockablePort(s, n)
                 self._sockets.append(kp)
-                t = threading.Thread(target=self.wait_and_listen, args=(kp,))
-                self._threads.append(t)
+                evt = threading.Event()
+                t = threading.Thread(target=self.wait_and_listen, args=(kp, evt,))
+                self._threads.append(evt)
                 t.start()
             else:
                 self.close()
@@ -101,23 +104,23 @@ class PortManager():
     def close_socket(self, s):
         self.notify_socket_closed(s.getsockname())
         try:
-            s.close()
             socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(s.getsockname())
+            s.close()
             log.debug("Closing %d" % s.getsockname()[1])
         except Exception as e:
             pass
 
-    def close_thread(self, t):
+    def close_thread(self, evt):
         try:
-            t.exit()
+            evt.set()
         except:
             pass
 
-    def close_threads(self):
+    def unlock_threads(self):
         while len(self._threads):
             try:
-                t = self._threads.pop()
-                self.close_thread(t)
+                evt = self._threads.pop()
+                self.close_thread(evt)
             except:
                 pass
 
@@ -132,8 +135,8 @@ class PortManager():
 
     def close(self):
         # TODO Close firewall
+        self.unlock_threads()
         self.close_sockets()
-        self.close_threads()
 
     def reset(self):
         self.close()
