@@ -10,10 +10,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class FirewallManager():
-    # TODO https://github.com/ldx/python-iptables
-    pass
-
 
 def main():
 
