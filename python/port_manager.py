@@ -38,7 +38,6 @@ class PortManager():
         while not evt.is_set():
             try:
                 sock, addr = s.accept()
-
                 self.notify_connection(p, addr, next_port)
                 self.handle_connection(sock, addr)
             except Exception as e:
@@ -59,6 +58,7 @@ class PortManager():
             log.debug("New connection to %d from %s, open the result!" % (p[1], addr[0]))
 
     def notify_error_opening_socket(self):
+        self.close()
         pass
 
     def open_socket(self, port):
@@ -70,8 +70,8 @@ class PortManager():
         except socket.error as e:
             if e.errno == 98:
                 log.critical("El puerto %d ya está siendo utilizado por otro proceso" % port)
-        except Exception as e:
-            self.notify_error_opening_socket()
+
+        return None
 
     def open(self, port_list):
 
@@ -95,18 +95,16 @@ class PortManager():
                 self._threads.append(evt)
                 t.start()
             else:
-                self.close()
+                self.notify_error_opening_socket()
                 break
 
     def notify_socket_closed(self, s_addr):
         log.debug("Closing socket on port %d" % (s_addr[1]))
 
     def close_socket(self, s):
-        self.notify_socket_closed(s.getsockname())
         try:
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(s.getsockname())
-            s.close()
-            log.debug("Closing %d" % s.getsockname()[1])
+            self.notify_socket_closed(s.getsockname())
+            s.shutdown(socket.SHUT_RDWR)
         except Exception as e:
             pass
 
@@ -151,6 +149,7 @@ class PortManagerWorker(ProcWorker):
     CLOSING_SOCKET = uuid.uuid4().bytes
     FIRST_PORT = uuid.uuid4().bytes
     LAST_PORT = uuid.uuid4().bytes
+    ERROR_OPENING_SOCKET = uuid.uuid4().bytes
 
     def __init__(self, i_q, o_q, pm=PortManager()):
         super(PortManagerWorker, self).__init__(i_q, o_q)
@@ -163,11 +162,9 @@ class PortManagerWorker(ProcWorker):
         self._pm.notify_error_opening_socket = bypass(self._pm.notify_error_opening_socket, self.notify_error_opening_socket)
 
     def notify_error_opening_socket(self):
-        print("Bypass error opening")
-        self._o.put(Event(ProcWorker.END, None))
+        self._o.put(Event(self.ERROR_OPENING_SOCKET, None))
 
     def notify_first_port(self, p):
-        print("Bypass first port")
         self._o.put(Event(self.FIRST_PORT, {'port': p}))
 
     def notify_socket_closed(self, s_addr):
