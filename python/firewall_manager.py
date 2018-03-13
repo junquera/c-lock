@@ -3,44 +3,25 @@ import iptc
 
 # export XTABLES_LIBDIR=/usr/lib/x86_64-linux-gnu/xtables
 
-# TODO https://github.com/ldx/python-iptables
+# GUIDE: https://github.com/ldx/python-iptables
 class FirewallManager():
 
     chain_rules = {}
 
     def backup(self):
-
-        table = iptc.Table(iptc.Table.FILTER)
-
-        for chain in table.chains:
-            if not chain.name in self.chain_rules:
-                self.chain_rules[chain.name] = []
-
-            for rule in chain.rules:
-                self.chain_rules[chain.name].append(rule)
-                chain.delete_rule(rule)
+        # TODO Search how to backup iptables
+        pass
 
     def restore(self):
-
-        table = iptc.Table(iptc.Table.FILTER)
-
-        for cn in self.chain_rules:
-            c = iptc.Chain(table, cn)
-
-            for rule in self.chain_rules[cn]:
-                c.insert_rule(rule)
-
-        self.chain_rules = {}
+        # TODO Search how to restore iptables
+        pass
 
 fwm = FirewallManager()
 
-# TODO Orden de chains en lugar de backup
-# fwm.backup()
-
-table = iptc.Table(iptc.Table.FILTER)
 
 
-def bootstrap():
+def start_protection():
+    table = iptc.Table(iptc.Table.FILTER)
 
     # Crear chain
     try:
@@ -55,7 +36,6 @@ def bootstrap():
         pass
 
     try:
-
         # TODO Las reglas que tenemos que borrar al terminar con *
         # Apuntar INPUT a toc-toc-ssh
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
@@ -79,13 +59,13 @@ def bootstrap():
         chain.flush()
 
         # Drop all
-        rule = iptc.Rule() # *
+        rule = iptc.Rule()
         rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "REJECT")
         chain.insert_rule(rule)
 
         # Accept all established
-        rule = iptc.Rule() # *
+        rule = iptc.Rule()
         rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "ACCEPT")
         match = iptc.Match(rule, "state")
@@ -94,7 +74,7 @@ def bootstrap():
         chain.insert_rule(rule)
 
         # Accept all output connections
-        rule = iptc.Rule() # *
+        rule = iptc.Rule()
         rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "ACCEPT")
         rule.src = "127.0.0.1"
@@ -106,6 +86,8 @@ def bootstrap():
         pass
 
 def open_port(port, origin=None):
+    table = iptc.Table(iptc.Table.FILTER)
+
     chain = iptc.Chain(table, "toc-toc-ssh")
 
     rule = iptc.Rule() # *
@@ -122,10 +104,12 @@ def open_port(port, origin=None):
     return rule
 
 def delete_rule(rule):
+    table = iptc.Table(iptc.Table.FILTER)
+
     chain = iptc.Chain(table, "toc-toc-ssh")
     chain.delete_rule(rule)
 
-bootstrap()
+start_protection()
 r = open_port(2424, origin="127.0.0.1")
 time.sleep(20)
 delete_rule(r)
