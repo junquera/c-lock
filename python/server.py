@@ -4,6 +4,7 @@ from ttp import *
 from queue import Queue
 from port_manager import *
 from port_manager import PortManagerWorker
+from firewall_manager import FirewallManager, FirewallManagerWorker
 
 import logging
 
@@ -30,6 +31,11 @@ def main():
 
     b = Broker(bq, oq)
 
+    fwm = FirewallManager()
+    fwmq = Queue()
+    b.add_client(fwmq)
+    fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
+    
     pmq = Queue()
     b.add_client(pmq)
     pm = PortManagerWorker(pmq, bq)
@@ -39,7 +45,7 @@ def main():
     ttpq = Queue()
     b.add_client(ttpq)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
-    # fwm = FirewallManager()
+
 
 if __name__ == '__main__':
     main()

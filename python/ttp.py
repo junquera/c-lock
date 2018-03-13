@@ -160,6 +160,7 @@ class TocTocPortsWorker(ProcWorker):
     def work(self):
 
         while self.stay_running:
+            # TODO Tal vez no desde aquí, pero hay que lanzar un evento con los puertos reservados
             self._o.put(Event(self.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
             next_t = self._ttp.next()
             log.debug("Next slot in %ds" % next_t)
@@ -171,5 +172,5 @@ class TocTocPortsWorker(ProcWorker):
 
         super(TocTocPortsWorker, self).process_evt(evt)
 
-        if evt.get_id() == TocTocPortsWorker.LAST_PORT:
+        if evt.get_id() == PortManagerWorker.LAST_PORT:
             self._o.put(Event(self.LAST_PORT, {'port': self._ttp.get_destination(), 'address': evt.get_value()['address']}))

@@ -1,8 +1,7 @@
 import uuid
 import socket
 import threading
-from proc_worker import *
-from proc_worker import bypass
+from proc_worker import ProcWorker, Event, bypass
 from ttp import TocTocPortsWorker
 
 import logging
