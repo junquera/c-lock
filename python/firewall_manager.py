@@ -1,4 +1,4 @@
-from proc_worker import ProcWorker, Event, bypass
+from proc_worker import ProcWorker, Event, bypass, PortManagerEvent, TocTocPortsEvent
 from ttp import TocTocPortsWorker
 from port_manager import PortManagerWorker
 import iptc
@@ -67,13 +67,13 @@ class FirewallManager():
         rule.add_match(match)
         chain.insert_rule(rule)
 
+        # TODO Not working right
         # Accept all output connections
-        rule = iptc.Rule()
-        rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "ACCEPT")
-        rule.src = "127.0.0.1"
-        rule.add_match(match)
-        chain.insert_rule(rule)
+        # rule = iptc.Rule()
+        # rule.protocol = "tcp"
+        # rule.target = iptc.Target(rule, "ACCEPT")
+        # rule.src = "127.0.0.1"
+        # chain.insert_rule(rule)
 
 
     def open_port(self, port, origin=None):
@@ -122,10 +122,19 @@ class FirewallManager():
         table = iptc.Table(iptc.Table.FILTER)
         chain = iptc.Chain(table, "toc-toc-ssh")
         chain.flush()
+
+        # Apuntar toc-toc-ssh a toc-toc-ssh-reject
+        rule = iptc.Rule() # *
+        rule.protocol = "tcp"
+        rule.target = iptc.Target(rule, "toc-toc-ssh-reject")
+        chain.insert_rule(rule)
+
+
         self.restore()
 
     def backup(self):
         # TODO Search how to backup iptables
+
         pass
 
     def restore(self):
@@ -148,7 +157,7 @@ class FirewallManagerWorker(ProcWorker):
         except Exception as e:
             log.debug("Error deleting rule %s: %s" % (str(rule), e))
 
-    def drop_rule_timer(self, rule, time=1):
+    def drop_rule_timer(self, rule, time=2):
         threading.Timer(time, self.drop_rule, args=(rule,)).start()
 
     def process_evt(self, evt):
@@ -158,7 +167,7 @@ class FirewallManagerWorker(ProcWorker):
             self._fwm.close()
 
 
-        if evt.get_id() == PortManagerWorker.NEW_CONNECTION:
+        if evt.get_id() == PortManagerEvent.NEW_CONNECTION:
             evt_value = evt.get_value()
             port = evt_value['next']
             addr = evt_value['address']
@@ -167,7 +176,7 @@ class FirewallManagerWorker(ProcWorker):
             threading.Thread(target=self.drop_rule_timer, args=(r,)).start()
 
 
-        if evt.get_id() == TocTocPortsWorker.LAST_PORT:
+        if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()
             port = evt_value['port']
             addr = evt_value['address']
@@ -175,14 +184,15 @@ class FirewallManagerWorker(ProcWorker):
             r = self._fwm.open_port(port, origin=addr)
             threading.Thread(target=self.drop_rule_timer, args=(r,), kwargs={'time':30}).start()
 
-        if evt.get_id() == PortManagerWorker.FIRST_PORT:
+        if evt.get_id() == PortManagerEvent.FIRST_PORT:
             evt_value = evt.get_value()
             port = evt_value['port']
             log.info("Opening first port %s" % (port))
             r = self._fwm.open_port(port)
-            threading.Thread(target=self.drop_rule_timer, args=(r,), kwargs={'time': 30}).start()
+            # TODO Dejarlo abierto X tiempo o esperar al siguiente slot?
+            # threading.Thread(target=self.drop_rule_timer, args=(r,), kwargs={'time': 30}).start()
 
 
-        if evt.get_id() == TocTocPortsWorker.NEW_SLOT:
+        if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             self._fwm.close()
             port_list = evt.get_value()['port_list'].get_values()

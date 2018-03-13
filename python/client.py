@@ -16,6 +16,7 @@ def toc_ports(ttp):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(1)
         try:
+            print("Connection to %d" % n)
             s.connect(('localhost', n))
             s.close()
         except:
@@ -28,6 +29,7 @@ def toc_ports(ttp):
         retry = 0
         n = values.next()
         log.debug("Next %d" % n)
+        time.sleep(0.2)
 
     log.debug("Opening port %d" % ttp.get_destination())
 

@@ -1,7 +1,7 @@
 import uuid
 import socket
 import threading
-from proc_worker import ProcWorker, Event, bypass
+from proc_worker import ProcWorker, Event, bypass, TocTocPortsEvent, PortManagerEvent
 from ttp import TocTocPortsWorker
 
 import logging
@@ -144,12 +144,6 @@ class PortManager():
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Event_Objects_between_Threads.php
 class PortManagerWorker(ProcWorker):
 
-    NEW_CONNECTION = uuid.uuid4().bytes
-    CLOSING_SOCKET = uuid.uuid4().bytes
-    FIRST_PORT = uuid.uuid4().bytes
-    LAST_PORT = uuid.uuid4().bytes
-    ERROR_OPENING_SOCKET = uuid.uuid4().bytes
-
     def __init__(self, i_q, o_q, pm=PortManager()):
         super(PortManagerWorker, self).__init__(i_q, o_q)
 
@@ -161,19 +155,19 @@ class PortManagerWorker(ProcWorker):
         self._pm.notify_error_opening_socket = bypass(self._pm.notify_error_opening_socket, self.notify_error_opening_socket)
 
     def notify_error_opening_socket(self):
-        self._o.put(Event(self.ERROR_OPENING_SOCKET, None))
+        self._o.put(Event(PortManagerEvent.ERROR_OPENING_SOCKET, None))
 
     def notify_first_port(self, p):
-        self._o.put(Event(self.FIRST_PORT, {'port': p}))
+        self._o.put(Event(PortManagerEvent.FIRST_PORT, {'port': p}))
 
     def notify_socket_closed(self, s_addr):
-        self._o.put(Event(self.CLOSING_SOCKET, {'port': s_addr[1]}))
+        self._o.put(Event(PortManagerEvent.CLOSING_SOCKET, {'port': s_addr[1]}))
 
     def notify_connection(self, p, addr, next_port):
         if next_port:
-            self._o.put(Event(self.NEW_CONNECTION, {'port': p[1], 'address': addr[0], 'next': next_port}))
+            self._o.put(Event(PortManagerEvent.NEW_CONNECTION, {'port': p[1], 'address': addr[0], 'next': next_port}))
         else:
-            self._o.put(Event(self.LAST_PORT, {'port': p[1], 'address': addr[0]}))
+            self._o.put(Event(PortManagerEvent.LAST_PORT, {'port': p[1], 'address': addr[0]}))
 
     def process_evt(self, evt):
         super(PortManagerWorker, self).process_evt(evt)
@@ -181,6 +175,6 @@ class PortManagerWorker(ProcWorker):
         if evt.get_id() == ProcWorker.END:
             self._pm.close()
 
-        if evt.get_id() == TocTocPortsWorker.NEW_SLOT:
+        if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             self._pm.close()
             self._pm.open(evt.get_value()['port_list'])

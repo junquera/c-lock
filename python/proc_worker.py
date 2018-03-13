@@ -72,3 +72,17 @@ class Event():
 
     def __str__(self):
         return "EVENT %s - %s" % (self._id, self._value )
+
+
+class PortManagerEvent():
+
+    NEW_CONNECTION = uuid.uuid4().bytes
+    CLOSING_SOCKET = uuid.uuid4().bytes
+    FIRST_PORT = uuid.uuid4().bytes
+    LAST_PORT = uuid.uuid4().bytes
+    ERROR_OPENING_SOCKET = uuid.uuid4().bytes
+
+class TocTocPortsEvent():
+
+    NEW_SLOT = uuid.uuid4().bytes
+    LAST_PORT = uuid.uuid4().bytes

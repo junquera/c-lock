@@ -1,4 +1,4 @@
-from proc_worker import ProcWorker, Event
+from proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
 import totp
 import time
 import uuid
@@ -149,9 +149,6 @@ class TocTocPorts():
 
 class TocTocPortsWorker(ProcWorker):
 
-    NEW_SLOT = uuid.uuid4().bytes
-    LAST_PORT = uuid.uuid4().bytes
-
     def __init__(self, i_q, o_q, ttp):
         super(TocTocPortsWorker, self).__init__(i_q, o_q)
         self._ttp = ttp
@@ -161,7 +158,7 @@ class TocTocPortsWorker(ProcWorker):
 
         while self.stay_running:
             # TODO Tal vez no desde aquí, pero hay que lanzar un evento con los puertos reservados
-            self._o.put(Event(self.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
+            self._o.put(Event(TocTocPortsEvent.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
             next_t = self._ttp.next()
             log.debug("Next slot in %ds" % next_t)
             time.sleep(next_t)
@@ -172,5 +169,5 @@ class TocTocPortsWorker(ProcWorker):
 
         super(TocTocPortsWorker, self).process_evt(evt)
 
-        if evt.get_id() == PortManagerWorker.LAST_PORT:
-            self._o.put(Event(self.LAST_PORT, {'port': self._ttp.get_destination(), 'address': evt.get_value()['address']}))
+        if evt.get_id() == PortManagerEvent.LAST_PORT:
+            self._o.put(Event(TocTocPortsEvent.LAST_PORT, {'port': self._ttp.get_destination(), 'address': evt.get_value()['address']}))
