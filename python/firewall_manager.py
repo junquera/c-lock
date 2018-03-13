@@ -35,7 +35,7 @@ class FirewallManager():
 fwm = FirewallManager()
 
 # TODO Orden de chains en lugar de backup
-fwm.backup()
+# fwm.backup()
 
 table = iptc.Table(iptc.Table.FILTER)
 
@@ -48,22 +48,78 @@ try:
 except:
     pass
 
+try:
+    table.create_chain("toc-toc-ssh-reject")
+except:
+    pass
+
+try:
+
+    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
+    rule = iptc.Rule()
+    rule.protocol = "tcp"
+    rule.target = iptc.Target(rule, "toc-toc-ssh")
+    chain.insert_rule(rule)
+
+    chain = iptc.Chain(table, "toc-toc-ssh")
+    chain.flush()
+
+    rule = iptc.Rule()
+    rule.protocol = "tcp"
+    rule.target = iptc.Target(rule, "toc-toc-ssh-reject")
+    chain.insert_rule(rule)
+
+    chain = iptc.Chain(table, "toc-toc-ssh-reject")
+    chain.flush()
+
+    # Accept all output
+    rule = iptc.Rule()
+    rule.protocol = "tcp"
+    rule.src = "127.0.0.1"
+    rule.target = iptc.Target(rule, "ACCEPT")
+    chain.insert_rule(rule)
+
+    # Drop all
+    rule = iptc.Rule()
+    rule.protocol = "tcp"
+    rule.dst = "127.0.0.1"
+    rule.target = iptc.Target(rule, "REJECT")
+    chain.insert_rule(rule)
+
+
+except Exception as e:
+    print(e)
+    pass
+
 chain = iptc.Chain(table, "toc-toc-ssh")
 
+# Accept all output
+'''
 rule = iptc.Rule()
-
 rule.protocol = "tcp"
 rule.src = "127.0.0.1"
+rule.target = iptc.Target(rule, "ACCEPT")
+chain.insert_rule(rule)
+'''
 
+# Deny all
+'''
+rule = iptc.Rule()
+rule.protocol = "tcp"
+rule.target = iptc.Target(rule, "REJECT")
+chain.insert_rule(rule)
+'''
+
+rule = iptc.Rule()
+rule.protocol = "tcp"
+rule.src = "127.0.0.1"
+rule.dst = "127.0.0.1"
 match = iptc.Match(rule, "tcp")
 match.dport = "2424"
 rule.add_match(match)
+rule.target = iptc.Target(rule, "ACCEPT")
+chain.insert_rule(rule)
 
-# match = iptc.Match(rule, "iprange")
-# # match.src_range = "127.0.0.1-127.0.0.2"
-# rule.add_match(match)
-
-rule.target = iptc.Target(rule, "DROP")
 
 # rule.protocol = "tcp"
 # m.dport = 22
@@ -72,11 +128,10 @@ rule.target = iptc.Target(rule, "DROP")
 # t = rule.create_target("DROP")
 # t.to_ports = "22"
 
-chain.insert_rule(rule)
 
-fwm.restore()
+# fwm.restore()
 
 print("Disabled")
-time.sleep(30)
+time.sleep(60)
 
 chain.delete_rule(rule)
