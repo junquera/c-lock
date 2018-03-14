@@ -14,9 +14,6 @@ def bypass(fa, fb):
 
 class ProcWorker(threading.Thread):
 
-    NONE = -1
-    END = uuid.uuid4().bytes
-
     stay_running = True
 
     def __init__(self, i_q, o_q):
@@ -32,7 +29,7 @@ class ProcWorker(threading.Thread):
                 self.process_evt(evt)
 
     def process_evt(self, evt):
-        if evt.get_id() == self.END:
+        if evt.get_id() == ProcWorkerEvent.END:
             log.debug("Received close signal")
             self.stay_running = False
             self._i.put(None)
@@ -73,6 +70,13 @@ class Event():
     def __str__(self):
         return "EVENT %s - %s" % (self._id, self._value )
 
+#-----------------------#
+
+class ProcWorkerEvent():
+
+    NONE = -1
+    END = uuid.uuid4().bytes
+
 
 class PortManagerEvent():
 
@@ -86,3 +90,8 @@ class TocTocPortsEvent():
 
     NEW_SLOT = uuid.uuid4().bytes
     LAST_PORT = uuid.uuid4().bytes
+
+
+class FirewallManagerEvent():
+
+    NEW_CONNECTION = uuid.uuid4().bytes

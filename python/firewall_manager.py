@@ -1,15 +1,15 @@
-from proc_worker import ProcWorker, Event, bypass, PortManagerEvent, TocTocPortsEvent
+from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
 from ttp import TocTocPortsWorker
 from port_manager import PortManagerWorker
-import iptc
 import uuid
 import logging
 import threading
 import time
+import iptc
+
+import os
 
 log = logging.getLogger(__name__)
-
-# export XTABLES_LIBDIR=/usr/lib/x86_64-linux-gnu/xtables
 
 # GUIDE: https://github.com/ldx/python-iptables
 class FirewallManager():
@@ -143,8 +143,6 @@ class FirewallManager():
 
 class FirewallManagerWorker(ProcWorker):
 
-    NEW_CONNECTION = uuid.uuid4().bytes
-
     def __init__(self, i_q, o_q, fwm=FirewallManager()):
 
         super(FirewallManagerWorker, self).__init__(i_q, o_q)
@@ -163,7 +161,7 @@ class FirewallManagerWorker(ProcWorker):
     def process_evt(self, evt):
         super(FirewallManagerWorker, self).process_evt(evt)
 
-        if evt.get_id() == ProcWorker.END:
+        if evt.get_id() == ProcWorkerEvent.END:
             self._fwm.close()
 
         if evt.get_id() == PortManagerEvent.NEW_CONNECTION:

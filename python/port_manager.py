@@ -1,7 +1,7 @@
 import uuid
 import socket
 import threading
-from proc_worker import ProcWorker, Event, bypass, TocTocPortsEvent, PortManagerEvent
+from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, TocTocPortsEvent, PortManagerEvent
 from ttp import TocTocPortsWorker
 
 import logging
@@ -172,7 +172,7 @@ class PortManagerWorker(ProcWorker):
     def process_evt(self, evt):
         super(PortManagerWorker, self).process_evt(evt)
 
-        if evt.get_id() == ProcWorker.END:
+        if evt.get_id() == ProcWorkerEvent.END:
             self._pm.close()
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:

@@ -2,10 +2,8 @@ import totp
 from proc_worker import Event, Broker
 from ttp import *
 from queue import Queue
-from port_manager import *
-from port_manager import PortManagerWorker
-from firewall_manager import FirewallManager, FirewallManagerWorker
 
+import os
 import logging
 
 log = logging.getLogger(__name__)
@@ -13,7 +11,6 @@ log = logging.getLogger(__name__)
 
 
 def main():
-
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -24,8 +21,25 @@ def main():
 
     # TODO Delete after debug
     secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799'
+
     log.debug("Secret: %s" % secret)
 
+    if not os.geteuid() == 0:
+        log.error("This program needs root for managing IPTABLES!")
+        return -1
+
+    try:
+        import iptc
+    except:
+
+        if 'XTABLES_LIBDIR' not in os.environ:
+            os.environ['XTABLES_LIBDIR'] = '/usr/lib/x86_64-linux-gnu/xtables'
+        else:
+            raise "Error, la variable XTABLES_LIBDIR está mal configurada"
+
+    from port_manager import PortManagerWorker, PortManager
+    from firewall_manager import FirewallManager, FirewallManagerWorker
+    
     oq = Queue()
     bq = Queue()
 
@@ -41,7 +55,7 @@ def main():
     pm = PortManager()
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
-    ttp = TocTocPorts(secret)
+    ttp = TocTocPorts(secret, forbidden=[8080])
 
     ttpq = Queue()
     b.add_client(ttpq)
