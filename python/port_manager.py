@@ -144,9 +144,12 @@ class PortManager():
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Event_Objects_between_Threads.php
 class PortManagerWorker(ProcWorker):
 
-    def __init__(self, i_q, o_q, pm=PortManager()):
+    def __init__(self, i_q, o_q, pm=None):
         super(PortManagerWorker, self).__init__(i_q, o_q)
 
+        if not pm:
+            pm = PortManager()
+            
         self._pm = pm
 
         self._pm.notify_socket_closed = bypass(self._pm.notify_socket_closed, self.notify_socket_closed)

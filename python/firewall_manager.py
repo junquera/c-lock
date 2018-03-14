@@ -132,9 +132,11 @@ class FirewallManager():
 
         chain = iptc.Chain(table, "toc-toc-ssh")
         chain.flush()
+        chain.delete()
 
         chain = iptc.Chain(table, "toc-toc-ssh-reject")
         chain.flush()
+        chain.delete()
 
         self.restore()
 
@@ -149,9 +151,12 @@ class FirewallManager():
 
 class FirewallManagerWorker(ProcWorker):
 
-    def __init__(self, i_q, o_q, fwm=FirewallManager()):
+    def __init__(self, i_q, o_q, fwm=None):
 
         super(FirewallManagerWorker, self).__init__(i_q, o_q)
+
+        if not fwm:
+            fwm = FirewallManager()
 
         self._fwm = fwm
 
@@ -213,5 +218,5 @@ class FirewallManagerWorker(ProcWorker):
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?
-            self._fwm.close()
+            # self._fwm.close()
             port_list = evt.get_value()['port_list'].get_values()
