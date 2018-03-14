@@ -39,7 +39,7 @@ def main():
 
     from port_manager import PortManagerWorker, PortManager
     from firewall_manager import FirewallManager, FirewallManagerWorker
-    
+
     oq = Queue()
     bq = Queue()
 

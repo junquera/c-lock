@@ -150,15 +150,18 @@ class FirewallManagerWorker(ProcWorker):
         self._fwm = fwm
 
     def drop_rule(self, rule):
+
         try:
             self._fwm.delete_rule(rule)
         except Exception as e:
             log.debug("Error deleting rule %s: %s" % (str(rule), e))
 
     def drop_rule_timer(self, rule, time=2):
+
         threading.Timer(time, self.drop_rule, args=(rule,)).start()
 
     def process_evt(self, evt):
+
         super(FirewallManagerWorker, self).process_evt(evt)
 
         if evt.get_id() == ProcWorkerEvent.END:
@@ -171,7 +174,6 @@ class FirewallManagerWorker(ProcWorker):
             log.info("Opening port %s for %s" % (port, addr))
             r = self._fwm.open_port(port, origin=addr)
             threading.Thread(target=self.drop_rule_timer, args=(r,)).start()
-
 
         if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()
