@@ -22,7 +22,7 @@ class FirewallManager():
         try:
             table.create_chain("toc-toc-ssh")
         except:
-            log.debug("toc-toc-ssh-reject exists!")
+            log.debug("toc-toc-ssh exists!")
 
         # Crear última chain
         try:
@@ -166,7 +166,6 @@ class FirewallManagerWorker(ProcWorker):
         if evt.get_id() == ProcWorker.END:
             self._fwm.close()
 
-
         if evt.get_id() == PortManagerEvent.NEW_CONNECTION:
             evt_value = evt.get_value()
             port = evt_value['next']
@@ -182,7 +181,7 @@ class FirewallManagerWorker(ProcWorker):
             addr = evt_value['address']
             log.info("Opening last port %s for %s" % (port, addr))
             r = self._fwm.open_port(port, origin=addr)
-            threading.Thread(target=self.drop_rule_timer, args=(r,), kwargs={'time':30}).start()
+            threading.Thread(target=self.drop_rule_timer, args=(r,), kwargs={'time': 30}).start()
 
         if evt.get_id() == PortManagerEvent.FIRST_PORT:
             evt_value = evt.get_value()
@@ -194,5 +193,6 @@ class FirewallManagerWorker(ProcWorker):
 
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
+            # TODO ¿Close o borrar las reglas guardadas?
             self._fwm.close()
             port_list = evt.get_value()['port_list'].get_values()

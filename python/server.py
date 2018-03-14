@@ -35,10 +35,11 @@ def main():
     fwmq = Queue()
     b.add_client(fwmq)
     fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
-    
+
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManagerWorker(pmq, bq)
+    pm = PortManager()
+    pmw = PortManagerWorker(pmq, bq, pm=pm)
 
     ttp = TocTocPorts(secret)
 
@@ -46,6 +47,7 @@ def main():
     b.add_client(ttpq)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
+    # TODO Clase orquestador
 
 if __name__ == '__main__':
     main()
