@@ -1,10 +1,12 @@
 import totp
-from proc_worker import Event, Broker
+from proc_worker import Event, Broker, ProcWorkerEvent
 from ttp import *
 from queue import Queue
-
+import time
 import os
 import logging
+
+import signal
 
 log = logging.getLogger(__name__)
 
@@ -61,6 +63,28 @@ def main():
     b.add_client(ttpq)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
+    # TODO Refactor de este método
+    def end(*args):
+        bq.put(Event(ProcWorkerEvent.END, None))
+        retry = 0
+        while retry <= 3:
+            if not fwmw.is_alive() and not pmw.is_alive() and not ttpw.is_alive() and not b.is_alive():
+                break
+            time.sleep(1)
+
+        if fwmw.is_alive():
+            log.warning("Bad killing thread fwmw")
+        if pmw.is_alive():
+            log.warning("Bad killing thread pmw")
+        if ttpw.is_alive():
+            log.warning("Bad killing thread ttpw")
+        if b.is_alive():
+            log.warning("Bad killing thread broker")
+
+
+        exit(0)
+
+    signal.signal(signal.SIGINT, end)
     # TODO Clase orquestador
 
 if __name__ == '__main__':

@@ -27,8 +27,11 @@ class ProcWorker(threading.Thread):
             evt = self._i.get(True)
             if evt:
                 self.process_evt(evt)
+                
+        # TODO Send end event!
 
     def process_evt(self, evt):
+        # TODO Send received event!
         if evt.get_id() == ProcWorkerEvent.END:
             log.debug("Received close signal")
             self.stay_running = False
