@@ -22,4 +22,14 @@ Ssh port knocking based in TOTP
 
 - [ ] Intentar mejorar todos los hilos (en especial, los de sockets)
 
-- [ ] Worker events -> Self file 
+- [ ] Worker events -> Self file
+
+- [ ] Varios puertos destino (por ejemplo, sistema web, db...)
+
+### URGENTE
+
+- [ ] README
+
+- [ ] Arg parser
+
+- [ ] Main en condiciones
