@@ -18,6 +18,8 @@ class FirewallManager():
 
         self.backup()
 
+        log.debug("Starting FirewallManager")
+
         table = iptc.Table(iptc.Table.FILTER)
 
         # Crear chain
@@ -138,18 +140,109 @@ class FirewallManager():
         chain.flush()
         chain.delete()
 
+        #TODO Delete chains
+
         self.restore()
 
     def backup(self):
         # TODO Search how to backup iptables
-
         pass
 
     def restore(self):
         # TODO Search how to restore iptables
         pass
 
+
+
+class RuleManager(threading.Thread):
+
+    stay_running = True
+    rules = {}
+
+    def __init__(self, fwm):
+        super(RuleManager, self).__init__()
+        self._lock = threading.Lock()
+        self._fwm = fwm
+        self.start()
+
+    def run(self):
+        while self.stay_running:
+            print("Step")
+            self.delete_caduced_rules()
+            time.sleep(1)
+
+    def close(self):
+        self.stay_running = False
+        self.delete_all_rules()
+
+    def lock(f):
+
+        def locker(self, *args, **kwargs):
+
+            self._lock.acquire()
+
+            res = f(self, *args, **kwargs)
+
+            self._lock.release()
+
+            return res
+
+        return locker
+
+    @lock
+    def add_rule(self, r, caducity=-1):
+
+        rule_id = str(uuid.uuid4())
+        log.debug("Adding rule %s -> %s" % (rule_id, str(r)))
+
+        self.rules[rule_id] = {
+            'rule': r,
+            'timestamp': time.time(),
+            'caducity': caducity
+        }
+
+        return rule_id
+
+    @lock
+    def get_rule(self, rule_id):
+
+        rule_data = self.rules.get(rule_id, None)
+
+        return rule_data
+
+    @lock
+    def delete_rule(self, rule_id):
+
+        if rule_id in self.rules:
+            rule_data = self.rules[rule_id]
+            try:
+                log.debug("Deleting rule %s -> %s" % (rule_id, str(rule_data.get('rule'))))
+                self._fwm.delete_rule(rule_data.get('rule'))
+            except Exception as e:
+                        print("Error deleting %s: %s" % (rule_id, str(e)))
+
+            self.rules[rule_id] = None
+
+    def delete_caduced_rules(self):
+        keys = self.rules.keys()
+
+        for rule_id in keys:
+            rule_data = self.get_rule(rule_id)
+            if rule_data:
+                print(rule_data)
+                print(((time.time() - rule_data['timestamp'])))
+                if rule_data['caducity'] < 0:
+                    continue
+                elif rule_data['caducity'] < ((time.time() - rule_data['timestamp'])):
+                    self.delete_rule(rule_id)
+
+    def delete_all_rules(self):
+        keys = self.rules.keys()
+        for rule_id in keys:
+            self.delete_rule(rule_id)
+
 class FirewallManagerWorker(ProcWorker):
+
 
     def __init__(self, i_q, o_q, fwm=None):
 
@@ -160,35 +253,15 @@ class FirewallManagerWorker(ProcWorker):
 
         self._fwm = fwm
 
-    def drop_rule(self, rule):
-        try:
-            self._fwm.delete_rule(rule)
-        except Exception as e:
-            log.debug("Error deleting rule %s: %s" % (str(rule), e))
-
-    def drop_rule_timer(self, rule, time=2):
-        threading.Timer(time, self.drop_rule, args=(rule,)).start()
+        # TODO Abrir puertos marcados como no gestionados (prohibidos)
+        self._rule_manager = RuleManager(fwm)
 
     def process_evt(self, evt):
-
-        '''
-        # Ref 1
-
-        Varias opciones:
-
-        - Crear lista con las reglas nuevas y método con lock que las inserte y borre
-
-        - Guardar solo la primera regla (para borrarla en cada NEW_SLOT) y eliminar
-        el resto sólo con timers
-
-        - Guardar reglas con timestamp, tiempo de vida y tener un thread encargado de ir
-        borrando las caducadas (la inserción y el borrado tienen que ser asíncronas)
-        (aprovechar para estudiar métodos filter, map...)
-        '''
 
         super(FirewallManagerWorker, self).process_evt(evt)
 
         if evt.get_id() == ProcWorkerEvent.END:
+            self._rule_manager.close()
             self._fwm.close()
 
         if evt.get_id() == PortManagerEvent.NEW_CONNECTION:
@@ -197,8 +270,7 @@ class FirewallManagerWorker(ProcWorker):
             addr = evt_value['address']
             log.info("Opening port %s for %s" % (port, addr))
             r = self._fwm.open_port(port, origin=addr)
-            # TODO Ref 1
-            threading.Thread(target=self.drop_rule_timer, args=(r,)).start()
+            self._rule_manager.add_rule(r, caducity=2)
 
         if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()
@@ -206,17 +278,17 @@ class FirewallManagerWorker(ProcWorker):
             addr = evt_value['address']
             log.info("Opening last port %s for %s" % (port, addr))
             r = self._fwm.open_port(port, origin=addr)
-            # TODO Ref 1
-            threading.Thread(target=self.drop_rule_timer, args=(r,), kwargs={'time': 30}).start()
+            self._rule_manager.add_rule(r, caducity=30)
 
         if evt.get_id() == PortManagerEvent.FIRST_PORT:
             evt_value = evt.get_value()
             port = evt_value['port']
             log.info("Opening first port %s" % (port))
             r = self._fwm.open_port(port)
+            self._rule_manager.add_rule(r)
 
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?
             # self._fwm.close()
-            port_list = evt.get_value()['port_list'].get_values()
+            self._rule_manager.delete_all_rules()
