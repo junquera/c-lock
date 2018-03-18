@@ -219,7 +219,7 @@ class RuleManager(threading.Thread):
                 log.debug("Deleting rule %s -> %s" % (rule_id, str(rule_data.get('rule'))))
                 self._fwm.delete_rule(rule_data.get('rule'))
             except Exception as e:
-                        print("Error deleting %s: %s" % (rule_id, str(e)))
+                log.error("Error deleting %s: %s" % (rule_id, str(e)))
 
             self.rules[rule_id] = None
 
@@ -229,8 +229,6 @@ class RuleManager(threading.Thread):
         for rule_id in keys:
             rule_data = self.get_rule(rule_id)
             if rule_data:
-                print(rule_data)
-                print(((time.time() - rule_data['timestamp'])))
                 if rule_data['caducity'] < 0:
                     continue
                 elif rule_data['caducity'] < ((time.time() - rule_data['timestamp'])):
@@ -283,7 +281,8 @@ class FirewallManagerWorker(ProcWorker):
             addr = evt_value['address']
             log.info("Opening last port %s for %s" % (port, addr))
             r = self._fwm.open_port(port, origin=addr)
-            self._rule_manager.add_rule(r, caducity=30)
+            # We protect this rule for allowing the user to connect on step change
+            self._rule_manager.add_rule(r, caducity=30, protected=True)
 
         if evt.get_id() == PortManagerEvent.FIRST_PORT:
             evt_value = evt.get_value()
