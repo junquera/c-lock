@@ -167,7 +167,6 @@ class RuleManager(threading.Thread):
 
     def run(self):
         while self.stay_running:
-            print("Step")
             self.delete_caduced_rules()
             time.sleep(1)
 
@@ -190,7 +189,7 @@ class RuleManager(threading.Thread):
         return locker
 
     @lock
-    def add_rule(self, r, caducity=-1):
+    def add_rule(self, r, caducity=-1, protected=False):
 
         rule_id = str(uuid.uuid4())
         log.debug("Adding rule %s -> %s" % (rule_id, str(r)))
@@ -198,7 +197,8 @@ class RuleManager(threading.Thread):
         self.rules[rule_id] = {
             'rule': r,
             'timestamp': time.time(),
-            'caducity': caducity
+            'caducity': caducity,
+            'protected': protected
         }
 
         return rule_id
@@ -236,10 +236,15 @@ class RuleManager(threading.Thread):
                 elif rule_data['caducity'] < ((time.time() - rule_data['timestamp'])):
                     self.delete_rule(rule_id)
 
-    def delete_all_rules(self):
+    # If `hard`, the protected rules are deleted too
+    def delete_all_rules(self, hard=False):
         keys = self.rules.keys()
         for rule_id in keys:
-            self.delete_rule(rule_id)
+            rule_data = self.get_rule(rule_id)
+            if rule_data:
+                # Delete if its not protected or hard deleting
+                if hard or not rule_data['protected']:
+                    self.delete_rule(rule_id)
 
 class FirewallManagerWorker(ProcWorker):
 
