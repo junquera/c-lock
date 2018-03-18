@@ -95,6 +95,13 @@ class FirewallManager():
         match.dport = "%d" % port
         rule.add_match(match)
         rule.target = iptc.Target(rule, "ACCEPT")
+
+        # TODO Puede servir para evitar repetidos
+        # try:
+        #     self.delete_rule(rule)
+        # except:
+        #     pass
+
         chain.insert_rule(rule)
 
         return rule
@@ -191,9 +198,12 @@ class RuleManager(threading.Thread):
     @lock
     def add_rule(self, r, caducity=-1, protected=False):
 
+        # TODO rule_id como hash de la regla para evitar repetidos
+        # Sin repetidos, sólo actualizaríamos la caducidad
         rule_id = str(uuid.uuid4())
         log.debug("Adding rule %s -> %s" % (rule_id, str(r)))
 
+        # TODO Comprobar si ya existe
         self.rules[rule_id] = {
             'rule': r,
             'timestamp': time.time(),
@@ -289,6 +299,7 @@ class FirewallManagerWorker(ProcWorker):
             port = evt_value['port']
             log.info("Opening first port %s" % (port))
             r = self._fwm.open_port(port)
+
             self._rule_manager.add_rule(r)
 
 
