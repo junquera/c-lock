@@ -24,6 +24,8 @@ def main():
     # TODO Delete after debug
     secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799'
 
+    forbidden = [8080]
+
     log.debug("Secret: %s" % secret)
 
     if not os.geteuid() == 0:
@@ -50,14 +52,14 @@ def main():
     fwm = FirewallManager()
     fwmq = Queue()
     b.add_client(fwmq)
-    fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
+    fwmw = FirewallManagerWorker(fwmq, bq, open_ports=forbidden, fwm=fwm)
 
     pmq = Queue()
     b.add_client(pmq)
     pm = PortManager()
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
-    ttp = TocTocPorts(secret, forbidden=[8080])
+    ttp = TocTocPorts(secret, forbidden=forbidden)
 
     ttpq = Queue()
     b.add_client(ttpq)

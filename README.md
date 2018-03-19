@@ -33,3 +33,5 @@ Ssh port knocking based in TOTP
 - [ ] Arg parser
 
 - [ ] Main en condiciones
+
+- [ ] Cerrar bien y matar threads

@@ -24,6 +24,12 @@ class FirewallManager():
 
         # Crear chain
         try:
+            table.create_chain("toc-toc-ssh-unmanaged")
+        except:
+            log.debug("toc-toc-ssh-unmanaged exists!")
+
+        # Crear chain
+        try:
             table.create_chain("toc-toc-ssh")
         except:
             log.debug("toc-toc-ssh exists!")
@@ -39,12 +45,17 @@ class FirewallManager():
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
+        rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
+        chain.insert_rule(rule)
+
+
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh-unmanaged")
+        rule = iptc.Rule() # *
+        rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "toc-toc-ssh")
         chain.insert_rule(rule)
 
-        # Our chain
-        chain = iptc.Chain(table, "toc-toc-ssh")
-        chain.flush()
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
 
         # Apuntar toc-toc-ssh a toc-toc-ssh-reject
         rule = iptc.Rule() # *
@@ -54,7 +65,6 @@ class FirewallManager():
 
         # Last chain!
         chain = iptc.Chain(table, "toc-toc-ssh-reject")
-        chain.flush()
 
         # Drop all
         rule = iptc.Rule()
@@ -79,6 +89,22 @@ class FirewallManager():
         # rule.src = "127.0.0.1"
         # chain.insert_rule(rule)
 
+    def unmanage_port(self, port):
+
+        table = iptc.Table(iptc.Table.FILTER)
+
+        chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
+
+        rule = iptc.Rule() # *
+        rule.protocol = "tcp"
+        match = iptc.Match(rule, "tcp")
+        match.dport = "%d" % port
+        rule.add_match(match)
+
+        # TODO Debería ir a INPUT, pero puede hacer un bucle infinito
+        rule.target = iptc.Target(rule, "ACCEPT")
+
+        chain.insert_rule(rule)
 
     def open_port(self, port, origin=None):
         # TODO Evitar insertar reglas repetidas
@@ -136,8 +162,12 @@ class FirewallManager():
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         rule = iptc.Rule()
         rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "toc-toc-ssh")
+        rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
         chain.delete_rule(rule)
+
+        chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
+        chain.flush()
+        chain.delete()
 
         chain = iptc.Chain(table, "toc-toc-ssh")
         chain.flush()
@@ -146,8 +176,6 @@ class FirewallManager():
         chain = iptc.Chain(table, "toc-toc-ssh-reject")
         chain.flush()
         chain.delete()
-
-        #TODO Delete chains
 
         self.restore()
 
@@ -257,7 +285,7 @@ class RuleManager(threading.Thread):
 class FirewallManagerWorker(ProcWorker):
 
 
-    def __init__(self, i_q, o_q, fwm=None):
+    def __init__(self, i_q, o_q, open_ports=[], fwm=None):
 
         super(FirewallManagerWorker, self).__init__(i_q, o_q)
 
@@ -268,6 +296,16 @@ class FirewallManagerWorker(ProcWorker):
 
         # TODO Abrir puertos marcados como no gestionados (prohibidos)
         self._rule_manager = RuleManager(fwm)
+        for port in open_ports:
+            self.unmanage_port(port)
+
+    def unmanage_port(self, port):
+        self._fwm.unmanage_port(port)
+
+    def open_port(self, port, origin=None, caducity=-1, protected=False):
+        r = self._fwm.open_port(port, origin=origin)
+        # We protect this rule for allowing the user to connect on step change
+        self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
 
     def process_evt(self, evt):
 
@@ -282,26 +320,23 @@ class FirewallManagerWorker(ProcWorker):
             port = evt_value['next']
             addr = evt_value['address']
             log.info("Opening port %s for %s" % (port, addr))
-            r = self._fwm.open_port(port, origin=addr)
-            self._rule_manager.add_rule(r, caducity=2)
+
+            self.open_port(port, origin=addr, caducity=2)
 
         if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()
             port = evt_value['port']
             addr = evt_value['address']
             log.info("Opening last port %s for %s" % (port, addr))
-            r = self._fwm.open_port(port, origin=addr)
-            # We protect this rule for allowing the user to connect on step change
-            self._rule_manager.add_rule(r, caducity=30, protected=True)
+
+            self.open_port(port, origin=addr, caducity=30, protected=True)
 
         if evt.get_id() == PortManagerEvent.FIRST_PORT:
             evt_value = evt.get_value()
             port = evt_value['port']
             log.info("Opening first port %s" % (port))
-            r = self._fwm.open_port(port)
 
-            self._rule_manager.add_rule(r)
-
+            self.open_port(port)
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?
