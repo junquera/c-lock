@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 
 
 
+# TODO Sacar a una clase y hacer el main con arg_parser
 def main():
     logging.basicConfig(
         level=logging.DEBUG,
@@ -72,7 +73,7 @@ def main():
         while retry <= 3:
             if not fwmw.is_alive() and not pmw.is_alive() and not ttpw.is_alive() and not b.is_alive():
                 break
-            time.sleep(1)
+            time.sleep(retry * 1)
 
         if fwmw.is_alive():
             log.warning("Bad killing thread fwmw")
@@ -83,8 +84,9 @@ def main():
         if b.is_alive():
             log.warning("Bad killing thread broker")
 
+        if fwmw.is_alive() or pmw.is_alive() or ttpw.is_alive() or b.is_alive():
+            exit(0)
 
-        exit(0)
 
     signal.signal(signal.SIGINT, end)
     # TODO Clase orquestador

@@ -41,6 +41,7 @@ class FirewallManager():
             log.debug("toc-toc-ssh-reject exists!")
 
         # TODO Las reglas que tenemos que borrar al terminar con *
+        # TODO ¿Debería venir desde ACCEPT?
         # Apuntar INPUT a toc-toc-ssh
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         rule = iptc.Rule() # *
@@ -189,6 +190,7 @@ class FirewallManager():
 
 
 
+# TODO Pasar ar ProcWorker
 class RuleManager(threading.Thread):
 
     stay_running = True
@@ -198,15 +200,17 @@ class RuleManager(threading.Thread):
         super(RuleManager, self).__init__()
         self._lock = threading.Lock()
         self._fwm = fwm
+        self._end_evt = threading.Event()
         self.start()
 
     def run(self):
         while self.stay_running:
             self.delete_caduced_rules()
-            time.sleep(1)
+            self._end_evt.wait(1)
 
     def close(self):
         self.stay_running = False
+        self._end_evt.set()
         self.delete_all_rules()
 
     def lock(f):

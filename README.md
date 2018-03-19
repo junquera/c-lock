@@ -26,6 +26,8 @@ Ssh port knocking based in TOTP
 
 - [ ] Varios puertos destino (por ejemplo, sistema web, db...)
 
+- [ ] Hacer método de limpieza de mis reglas de IPTABLES
+
 ### URGENTE
 
 - [ ] README
@@ -35,3 +37,5 @@ Ssh port knocking based in TOTP
 - [ ] Main en condiciones
 
 - [ ] Cerrar bien y matar threads
+
+- [ ] Maqueta de instalador

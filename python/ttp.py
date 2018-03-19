@@ -154,6 +154,7 @@ class TocTocPortsWorker(ProcWorker):
         self._ttp = ttp
         threading.Thread(target=self.work).start()
 
+    # TODO Cerrar este thread
     def work(self):
 
         while self.stay_running:
@@ -161,7 +162,7 @@ class TocTocPortsWorker(ProcWorker):
             self._o.put(Event(TocTocPortsEvent.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
             next_t = self._ttp.next()
             log.debug("Next slot in %ds" % next_t)
-            time.sleep(next_t)
+            self._end_evt.wait(next_t)
 
         log.debug("Fin del thread de TocTocPorts")
 

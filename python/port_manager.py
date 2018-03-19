@@ -149,7 +149,7 @@ class PortManagerWorker(ProcWorker):
 
         if not pm:
             pm = PortManager()
-            
+
         self._pm = pm
 
         self._pm.notify_socket_closed = bypass(self._pm.notify_socket_closed, self.notify_socket_closed)

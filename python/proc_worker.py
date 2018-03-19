@@ -20,6 +20,7 @@ class ProcWorker(threading.Thread):
         super(ProcWorker, self).__init__()
         self._i = i_q
         self._o = o_q
+        self._end_evt = threading.Event()
         self.start()
 
     def run(self):
@@ -27,8 +28,9 @@ class ProcWorker(threading.Thread):
             evt = self._i.get(True)
             if evt:
                 self.process_evt(evt)
-                
+
         # TODO Send end event!
+        self._end_evt.set()
 
     def process_evt(self, evt):
         # TODO Send received event!
