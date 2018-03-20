@@ -28,7 +28,7 @@ Ssh port knocking based in TOTP
 
 - [ ] Hacer método de limpieza de mis reglas de IPTABLES
 
-### URGENTE
+### URGENTE - Para versión 0.0.1 (alpha-1)
 
 - [ ] README
 
@@ -36,6 +36,6 @@ Ssh port knocking based in TOTP
 
 - [ ] Main en condiciones
 
-- [ ] Cerrar bien y matar threads
+- [x] Cerrar bien y matar threads
 
 - [ ] Maqueta de instalador

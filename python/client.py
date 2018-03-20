@@ -6,7 +6,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-def toc_ports(ttp):
+def toc_ports(ttp, address):
 
     values = ttp.get_actual()
 
@@ -17,7 +17,7 @@ def toc_ports(ttp):
         s.settimeout(1)
         try:
             print("Connection to %d" % n)
-            s.connect(('localhost', n))
+            s.connect((address, n))
             s.close()
         except:
             if retry > 3:
@@ -33,15 +33,23 @@ def toc_ports(ttp):
 
     log.debug("Opening port %d" % ttp.get_destination())
 
+import argparse
 def main():
 
-    secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799'
+    parser = argparse.ArgumentParser(description='Launch TOTP based port knocking protection')
+    parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
+    parser.add_argument('-a', '--address', default='127.0.0.1', help="Address to knock")
+    parser.add_argument('-s', '--secret', help="Secret part of TOTP", required=True)
+    args = parser.parse_args()
+
+    secret = args.secret
+    address = args.address
 
     log.debug("Secret: %s" % secret)
 
     ports = TocTocPorts(secret)
     print(ports)
-    toc_ports(ports)
+    toc_ports(ports, address)
 
 if __name__ == '__main__':
     main()
