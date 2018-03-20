@@ -47,7 +47,7 @@ class FirewallManager():
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
-        chain.insert_rule(rule)
+        chain.insert_rule(rule,position=len(chain.rules))
 
 
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh-unmanaged")
@@ -133,6 +133,20 @@ class FirewallManager():
 
         return rule
 
+    def gen_rule(self, port, origin=None):
+
+        rule = iptc.Rule() # *
+        rule.protocol = "tcp"
+        if origin:
+            rule.src = origin
+        rule.dst = "127.0.0.1"
+        match = iptc.Match(rule, "tcp")
+        match.dport = "%d" % port
+        rule.add_match(match)
+        rule.target = iptc.Target(rule, "ACCEPT")
+
+        return rule
+
     def close_port(self, port, origin=None):
         table = iptc.Table(iptc.Table.FILTER)
 
@@ -164,7 +178,9 @@ class FirewallManager():
         rule = iptc.Rule()
         rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
-        chain.delete_rule(rule)
+
+        while rule in chain.rules:
+            chain.delete_rule(rule)
 
         chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
         chain.flush()
@@ -246,6 +262,24 @@ class RuleManager(threading.Thread):
         return rule_id
 
     @lock
+    def exist_rule(self, r):
+
+        for rule in self.rules:
+            raux = self.rules[rule]
+            if raux['rule'] == r:
+                return rule
+
+        return None
+
+    @lock
+    def renew_rule_timestamp(self, rule_id, caducity=None):
+
+        if caducity:
+            self.rules[rule_id]['caducity'] = caducity
+
+        self.rules[rule_id]['timestamp'] = time.time()
+
+    @lock
     def get_rule(self, rule_id):
 
         rule_data = self.rules.get(rule_id, None)
@@ -263,10 +297,11 @@ class RuleManager(threading.Thread):
             except Exception as e:
                 log.error("Error deleting %s: %s" % (rule_id, str(e)))
 
-            self.rules[rule_id] = None
+            del self.rules[rule_id]
 
     def delete_caduced_rules(self):
-        keys = self.rules.keys()
+        # Copy of keys
+        keys = [key for key in self.rules.keys()]
 
         for rule_id in keys:
             rule_data = self.get_rule(rule_id)
@@ -278,7 +313,9 @@ class RuleManager(threading.Thread):
 
     # If `hard`, the protected rules are deleted too
     def delete_all_rules(self, hard=False):
-        keys = self.rules.keys()
+
+        keys = [key for key in self.rules.keys()]
+
         for rule_id in keys:
             rule_data = self.get_rule(rule_id)
             if rule_data:
@@ -307,9 +344,14 @@ class FirewallManagerWorker(ProcWorker):
         self._fwm.unmanage_port(port)
 
     def open_port(self, port, origin=None, caducity=-1, protected=False):
-        r = self._fwm.open_port(port, origin=origin)
         # We protect this rule for allowing the user to connect on step change
-        self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
+        r = self._fwm.gen_rule(port, origin=origin)
+        exist = self._rule_manager.exist_rule(r)
+        if exist:
+            self._rule_manager.renew_rule_timestamp(exist)
+        else:
+            self._fwm.open_port(port, origin=origin)
+            self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
 
     def process_evt(self, evt):
 
