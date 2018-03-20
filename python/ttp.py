@@ -129,10 +129,15 @@ class TocTocPorts():
         return PortList(portsn)
 
     def __str__(self):
+        def row(values):
+            return "| " + ("{:<15}| "*len(values)).format(*values) + "\n"
+
         res = ''
-        banner = "N\tPrev\t\tActu\t\tNext\n"
+        banner = row(["N", "Prev", "Actu", "Next"]) # "N\tPrev\t\tActu\t\tNext\n"
+        res += ("-" * (len(banner) - 2))
+        res += "\n"
         res += (banner)
-        res += ("-" * len(banner))
+        res += ("-" * (len(banner) - 2))
         res += "\n"
 
         ports = self.get_all()
@@ -141,10 +146,11 @@ class TocTocPorts():
         n = ports['n'].get_values()
 
         for port in range(len(p)):
-            res += ("%d\t%d\t\t%d\t\t%d\n" % (port, p[port], a[port], n[port]))
-        res += ("-" * len(banner))
+            res += (row((port, p[port], a[port], n[port])))
+        res += ("-" * (len(banner) - 2))
         res += "\n"
 
+        res += " [*] NEXT_SLOT: %ds\n" % self.next()
         return res
 
 class TocTocPortsWorker(ProcWorker):
