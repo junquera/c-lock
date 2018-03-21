@@ -1,6 +1,126 @@
 # toc-toc-ssh
 
-Port knocking based in TOTP.
+A TOTP based port knocking service. Every time slot, it generates a sequence of ports that must be *knocked* (in a correct order) before the final port (it have been designed for protecting a SSH service) becames opened.
+
+<!-- https://dashboard.moovly.com -->
+
+## Table of Contents
+
+
+
+## Installation
+
+### System dependencies
+
+This is the software with wich I have worked:
+
+- python 3.x
+
+- iptables >= v1.6
+
+It has been tested in *Ubuntu 16.04* and *Debian 9*, but should work with any other system with theese systems installed.
+
+### Software dependencies
+
+As it is just an alpha version, it has no currently an automated installer, because until it comes debugged and improved, it shouldnt have yet integration with the system.
+
+For install dependencies there are two options:
+
+- **Option A**: requeriments.txt
+
+```bash
+pip3 install -r requeriments.txt
+```
+
+- **Option B**: [Pipenv](https://github.com/pypa/pipenv) (*Recommended*)
+
+```bash
+pip3 install pipenv
+pipenv install -r requeriments.txt
+```
+
+## Usage
+
+### Server
+
+Must be launch as root (for managing the *iptables* rules):
+
+```
+usage: server.py [-h] [-ts SLOT] [-f FORBIDDEN [FORBIDDEN ...]] [-a ADDRESS]
+                 [-s SECRET] [-p PROTECTED_PORT] [--gen-secret]
+                 [--clean-firewall] [--log-level LOG_LEVEL]
+
+Launch TOTP based port knocking protection
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -ts SLOT, --time-slot SLOT
+                        Time slot for TOTP
+  -f FORBIDDEN [FORBIDDEN ...], --forbidden FORBIDDEN [FORBIDDEN ...]
+                        Ports already in use or not manageable (space
+                        separated)
+  -a ADDRESS, --address ADDRESS
+                        Address to protect
+  -s SECRET, --secret SECRET
+                        Secret part of TOTP
+  -p PROTECTED_PORT, --protected-port PROTECTED_PORT
+                        Port which has to be protected
+  --gen-secret          Generate random secret
+  --clean-firewall      Clean firewall configuration (e.g., after a bad close)
+  --log-level LOG_LEVEL
+                        Log level
+```
+
+### Client
+
+```
+usage: client.py [-h] [-ts SLOT] [-a ADDRESS] -s SECRET
+
+Launch TOTP based port knocking protection
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -ts SLOT, --time-slot SLOT
+                        Time slot for TOTP
+  -a ADDRESS, --address ADDRESS
+                        Address to knock
+  -s SECRET, --secret SECRET
+                        Secret part of TOTP
+```
+
+## Contributing
+
+
+
+## Credits
+
+
+
+## License
+
+```
+MIT License
+
+Copyright (c) 2018 Javier Junquera Sánchez
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## README
 
@@ -8,7 +128,7 @@ Port knocking based in TOTP.
 
 - [ ] Project name: Your project’s name is the first thing people will see upon scrolling down to your README, and is included upon creation of your README file.
 
-- [ ] Description: A description of your project follows. A good description is clear, short, and to the point. Describe the importance of your project, and what it does.
+- [x] Description: A description of your project follows. A good description is clear, short, and to the point. Describe the importance of your project, and what it does.
 
 - [ ] Table of Contents: Optionally, include a table of contents in order to allow other people to quickly navigate especially long or detailed READMEs.
 
