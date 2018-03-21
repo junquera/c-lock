@@ -28,6 +28,8 @@ Ssh port knocking based in TOTP
 
 - [ ] Hacer método de limpieza de mis reglas de IPTABLES
 
+- [ ] Clase orquestador
+
 ### URGENTE - Para versión 0.0.1 (alpha-1)
 
 - [ ] README

@@ -171,7 +171,7 @@ class FirewallManager():
         chain = iptc.Chain(table, "toc-toc-ssh")
         chain.delete_rule(rule)
 
-    def close(self):
+    def clean_firewall(self):
         table = iptc.Table(iptc.Table.FILTER)
 
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
@@ -194,6 +194,9 @@ class FirewallManager():
         chain.flush()
         chain.delete()
 
+
+    def close(self):
+        self.clean_firewall()
         self.restore()
 
     def backup(self):
