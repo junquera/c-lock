@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 def check_environment():
 
     if not os.geteuid() == 0:
-        raise "This program needs root for managing IPTABLES!"
+        raise Exception("This program needs root for managing IPTABLES!")
 
     try:
         import iptc
@@ -22,7 +22,7 @@ def check_environment():
         if 'XTABLES_LIBDIR' not in os.environ:
             os.environ['XTABLES_LIBDIR'] = '/usr/lib/x86_64-linux-gnu/xtables'
         else:
-            raise "Error, la variable XTABLES_LIBDIR está mal configurada"
+            raise Exception("Error, la variable XTABLES_LIBDIR está mal configurada")
 
 
 # TODO Sacar a una clase y hacer el main con arg_parser
