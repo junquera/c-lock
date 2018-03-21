@@ -30,6 +30,8 @@ Ssh port knocking based in TOTP
 
 - [ ] Clase orquestador
 
+- [ ] Extraer método lock de asíncronos
+
 ### URGENTE - Para versión 0.0.1 (alpha-1)
 
 - [ ] README

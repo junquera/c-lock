@@ -33,6 +33,7 @@ class PortManager():
         p = s.getsockname()
         next_port = kp.get_next_port()
 
+        errors = 0
         # TODO Ver por qué no termina el hilo...
         while not evt.is_set():
             try:
@@ -40,7 +41,12 @@ class PortManager():
                 self.notify_connection(p, addr, next_port)
                 self.handle_connection(sock, addr)
             except Exception as e:
-                self.notify_error_opening_socket()
+                if not evt.is_set():
+                    log.error("Error on socket: %s" % str(e))
+                    errors += 1
+                    if errors >= 3:
+                        log.critical("Error on socket: %s" % str(e))
+                        break
 
         log.debug("Fin del thread del socket %s" % str(p))
 
@@ -69,6 +75,8 @@ class PortManager():
         except socket.error as e:
             if e.errno == 98:
                 log.critical("El puerto %d ya está siendo utilizado por otro proceso" % port)
+            else:
+                log.critical("Error al abrir puerto %d: %s" % (port, e))
 
         return None
 
@@ -97,6 +105,8 @@ class PortManager():
                 self.notify_error_opening_socket()
                 break
 
+        print("End open")
+
     def notify_socket_closed(self, s_addr):
         log.debug("Closing socket on port %d" % (s_addr[1]))
 
@@ -122,6 +132,7 @@ class PortManager():
                 pass
 
     def close_sockets(self):
+        # Copy self._sockets
         while len(self._sockets):
             try:
                 kp = self._sockets.pop()
@@ -129,13 +140,12 @@ class PortManager():
                 self.close_socket(s)
             except:
                 pass
-
     def close(self):
-        # TODO Close firewall
         self.unlock_threads()
         self.close_sockets()
+        print("End close")
 
-    def reset(self):
+    def reset(self, port_list):
         self.close()
         self.open()
 
