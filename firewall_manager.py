@@ -353,9 +353,12 @@ class FirewallManagerWorker(ProcWorker):
         if exist:
             self._rule_manager.renew_rule_timestamp(exist)
         else:
-            self._fwm.open_port(port, origin=origin)
-            self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
-
+            try:
+                self._fwm.open_port(port, origin=origin)
+                self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
+            except Exception as e:
+                log.critical("Error opening port %d: %e" % (port, e))
+                
     def process_evt(self, evt):
 
         super(FirewallManagerWorker, self).process_evt(evt)

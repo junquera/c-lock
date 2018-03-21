@@ -105,7 +105,6 @@ class PortManager():
                 self.notify_error_opening_socket()
                 break
 
-        print("End open")
 
     def notify_socket_closed(self, s_addr):
         log.debug("Closing socket on port %d" % (s_addr[1]))
@@ -140,10 +139,10 @@ class PortManager():
                 self.close_socket(s)
             except:
                 pass
+
     def close(self):
         self.unlock_threads()
         self.close_sockets()
-        print("End close")
 
     def reset(self, port_list):
         self.close()
