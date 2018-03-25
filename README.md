@@ -41,6 +41,15 @@ pipenv install -r requeriments.txt
 
 ## Usage
 
+First of all, you need to get a secret for initialize the TOTP system:
+
+```
+$ python3 server.py --gen-secret
+TOTP Secret: 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee081fb2430126253563b03836b6e1a1
+```
+
+Then you can run `server.py` with this secret.
+
 ### Server
 
 Must be launch as root (for managing the *iptables* rules):
@@ -71,6 +80,23 @@ optional arguments:
                         Log level
 ```
 
+The most simple usage is:
+
+```
+$ sudo python3 server.py -s 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee081fb2430126253563b03836b6e1a1
+
+2018-03-25 13:27:20,831 - __main__ - DEBUG - Secret: 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee081fb2430126253563b03836b6e1a1
+2018-03-25 13:27:20,907 - firewall_manager - DEBUG - Starting FirewallManager
+2018-03-25 13:27:20,912 - ttp - DEBUG - Next slot in 10s
+2018-03-25 13:27:20,912 - port_manager - DEBUG - First port: 8289
+2018-03-25 13:27:20,913 - port_manager - INFO - Opening 8289
+2018-03-25 13:27:20,913 - port_manager - INFO - Opening 3913
+2018-03-25 13:27:20,913 - firewall_manager - INFO - Opening first port 8289
+2018-03-25 13:27:20,914 - port_manager - INFO - Opening 4852
+2018-03-25 13:27:20,915 - port_manager - INFO - Opening 6218
+2018-03-25 13:27:20,915 - firewall_manager - DEBUG - Adding rule 23c8aae9-31d3-4cc6-a50d-9f14bc9eccf1 -> <iptc.ip4tc.Rule object at 0x7fcacd6b6940>
+```
+
 ### Client
 
 ```
@@ -87,6 +113,12 @@ optional arguments:
   -s SECRET, --secret SECRET
                         Secret part of TOTP
 ```
+
+## Examples
+
+This is how it shows when a client interacts with the server:
+
+![Working example](img/working_example.png)
 
 ## Contributing
 
@@ -180,7 +212,7 @@ SOFTWARE.
 
 - [x] Arg parser
 
-- [ ] Main en condiciones
+- [x] Main en condiciones
 
 - [x] Cerrar bien y matar threads
 
