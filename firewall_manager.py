@@ -40,24 +40,41 @@ class FirewallManager():
         except:
             log.debug("toc-toc-ssh-reject exists!")
 
-        # TODO Las reglas que tenemos que borrar al terminar con *
         # TODO ¿Debería venir desde ACCEPT?
-        # Apuntar INPUT a toc-toc-ssh
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
+        # Apuntar INPUT a toc-toc-ssh-unmanaged
         rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
         chain.insert_rule(rule,position=len(chain.rules))
 
 
+        # toc-toc-ssh-unmanaged config
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh-unmanaged")
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
         rule.target = iptc.Target(rule, "toc-toc-ssh")
         chain.insert_rule(rule)
 
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
+        # Accept all established
+        rule = iptc.Rule()
+        rule.protocol = "tcp"
+        rule.target = iptc.Target(rule, "ACCEPT")
+        match = iptc.Match(rule, "state")
+        match.state = "RELATED,ESTABLISHED"
+        rule.add_match(match)
+        chain.insert_rule(rule)
 
+        # TODO Add option to block also this connections
+        # Accept all localhost connections
+        rule = iptc.Rule() # *
+        rule.protocol = "tcp"
+        rule.src = "127.0.0.1"
+        rule.target = iptc.Target(rule, "ACCEPT")
+        chain.insert_rule(rule)
+
+        # toc-toc-ssh config
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
         # Apuntar toc-toc-ssh a toc-toc-ssh-reject
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
@@ -73,14 +90,6 @@ class FirewallManager():
         rule.target = iptc.Target(rule, "REJECT")
         chain.insert_rule(rule)
 
-        # Accept all established
-        rule = iptc.Rule()
-        rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "ACCEPT")
-        match = iptc.Match(rule, "state")
-        match.state = "RELATED,ESTABLISHED"
-        rule.add_match(match)
-        chain.insert_rule(rule)
 
         # TODO Not working right
         # Accept all output connections
@@ -358,7 +367,7 @@ class FirewallManagerWorker(ProcWorker):
                 self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
             except Exception as e:
                 log.critical("Error opening port %d: %e" % (port, e))
-                
+
     def process_evt(self, evt):
 
         super(FirewallManagerWorker, self).process_evt(evt)
