@@ -218,6 +218,9 @@ SOFTWARE.
 
 - [ ] Maqueta de instalador
 
+- [ ] Correct XTABLES dir
+
+- [ ] Test in vm
 
 ## Atrribution
 
