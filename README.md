@@ -28,17 +28,17 @@ Because `python-cryptography` is needed for some dependencies, it must be instal
 
 For install dependencies there are two options:
 
-- **Option A**: requeriments.txt
-
-```bash
-pip3 install -r requeriments.txt
-```
-
-- **Option B**: [Pipenv](https://github.com/pypa/pipenv) (*Recommended*)
+- **Option A**: [Pipenv](https://github.com/pypa/pipenv) (*Recommended*)
 
 ```bash
 pip3 install pipenv
 pipenv install -r requeriments.txt
+```
+
+- **Option B**: requeriments.txt
+
+```bash
+pip3 install -r requeriments.txt
 ```
 
 ## Usage
@@ -188,7 +188,9 @@ SOFTWARE.
 
 - [ ] Asegurar cierre (y sobre todo, limpieza de las iptables). Se puede hacer un proceso que compruebe que está corriendo.
 
-- [ ] Servidor web configuración
+- [ ] Servidor web con configuración, generación de bidi para secreto...
+
+- [ ] Cómo evitar segmentation fault.
 
 ### Para versión 0.0.1 (alpha-1)
 
@@ -209,6 +211,10 @@ SOFTWARE.
 - [ ] Select address in port_manager y firewall_manager
 
 - [ ] Log level in client
+
+- [ ] Opción en server de limpiar iptables
+
+- [ ] Crear un buen sistema para los thread
 
 ### Para versión 0.0.2 (alpha-2)
 

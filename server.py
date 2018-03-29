@@ -68,6 +68,8 @@ def main_server(secret, slot, forbidden):
 
     # TODO Refactor de este método
     def end(*args):
+        signum = args[0]
+        log.warning('Signal handler called with signal %s' % signum)
         bq.put(Event(ProcWorkerEvent.END, None))
         retry = 0
         while retry <= 3:
@@ -89,6 +91,11 @@ def main_server(secret, slot, forbidden):
 
 
     signal.signal(signal.SIGINT, end)
+    signal.signal(signal.SIGSEGV, end)
+    signal.signal(signal.SIGFPE, end)
+    signal.signal(signal.SIGABRT, end)
+    signal.signal(signal.SIGBUS, end)
+    signal.signal(signal.SIGILL, end)
     # TODO Clase orquestador
 
 import argparse
