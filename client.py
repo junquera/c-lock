@@ -5,6 +5,10 @@ import time
 import logging
 
 log = logging.getLogger(__name__)
+logging.basicConfig(
+    level= logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 def toc_ports(ttp, address):
 
@@ -21,7 +25,7 @@ def toc_ports(ttp, address):
             s.close()
         except:
             if retry > 3:
-                log.error("Max retries! Port %d doesnt work" % n)
+                log.error("Max retries! Port %d (at %s) doesnt work" % (n, address))
                 return
             retry += 1
             time.sleep(retry * 0.1)
@@ -38,13 +42,14 @@ def main():
 
     parser = argparse.ArgumentParser(description='Launch TOTP based port knocking protection')
     parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
-    parser.add_argument('-a', '--address', default='127.0.0.1', help="Address to knock")
+    parser.add_argument('-a', '--address', help="Address to knock", required=True)
     parser.add_argument('-s', '--secret', help="Secret part of TOTP", required=True)
     args = parser.parse_args()
 
     secret = args.secret
     address = args.address
 
+    log.debug("Address: %s" % address)
     log.debug("Secret: %s" % secret)
 
     ports = TocTocPorts(secret)

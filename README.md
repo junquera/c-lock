@@ -14,15 +14,17 @@ A TOTP based port knocking service. Every time slot, it generates a sequence of 
 
 This is the software with wich I have worked:
 
-- python 3.x
+- `python 3.x`
 
-- iptables >= v1.6
+- `iptables >= v1.6`
 
 It has been tested in *Ubuntu 16.04* and *Debian 9*, but should work with any other system with theese systems installed.
 
 ### Software dependencies
 
 As it is just an alpha version, it has no currently an automated installer, because until it comes debugged and improved, it shouldnt have yet integration with the system.
+
+Because `python-cryptography` is needed for some dependencies, it must be installed before anything else: [Building cryptography on linux](https://cryptography.io/en/latest/installation/#building-cryptography-on-linux)
 
 For install dependencies there are two options:
 
@@ -100,7 +102,7 @@ $ sudo python3 server.py -s 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee08
 ### Client
 
 ```
-usage: client.py [-h] [-ts SLOT] [-a ADDRESS] -s SECRET
+usage: client.py [-h] [-ts SLOT] -a ADDRESS -s SECRET
 
 Launch TOTP based port knocking protection
 
@@ -122,9 +124,9 @@ This is how it shows when a client interacts with the server:
 
 ## Contributing
 
-By now, and until I finish a first stable version, I want to control the code. The best way of contribute to this project is apporting ideas and
+By now, and until I finish a first stable version, I want to control the code. The best way of contribute to this project is apporting ideas and reviewing code. Any help is welcome!
 
-## Credits
+<!-- ## Credits -->
 
 ## License
 
@@ -186,7 +188,9 @@ SOFTWARE.
 
 - [ ] Asegurar cierre (y sobre todo, limpieza de las iptables). Se puede hacer un proceso que compruebe que está corriendo.
 
-### URGENTE - Para versión 0.0.1 (alpha-1)
+- [ ] Servidor web configuración
+
+### Para versión 0.0.1 (alpha-1)
 
 - [x] README
 
@@ -196,11 +200,23 @@ SOFTWARE.
 
 - [x] Cerrar bien y matar threads
 
-- [ ] Maqueta de instalador (Makefile.am, config...)
+- [ ] Maqueta de instalador (Makefile, config...)
 
 - [x] Correct XTABLES dir
 
 - [ ] Test in vm
+
+- [ ] Select address in port_manager y firewall_manager
+
+- [ ] Log level in client
+
+### Para versión 0.0.2 (alpha-2)
+
+- [ ] YAML config
+
+- [ ] Lista de puertos destino
+
+- [ ] Configuración de tiempo de apertura para puertos destino.
 
 <!-- ## Atrribution
 

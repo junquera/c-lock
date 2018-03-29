@@ -126,7 +126,7 @@ class FirewallManager():
         rule.protocol = "tcp"
         if origin:
             rule.src = origin
-        rule.dst = "127.0.0.1"
+        # rule.dst = "0.0.0.0"
         match = iptc.Match(rule, "tcp")
         match.dport = "%d" % port
         rule.add_match(match)
@@ -148,7 +148,7 @@ class FirewallManager():
         rule.protocol = "tcp"
         if origin:
             rule.src = origin
-        rule.dst = "127.0.0.1"
+        # rule.dst = "0.0.0.0"
         match = iptc.Match(rule, "tcp")
         match.dport = "%d" % port
         rule.add_match(match)
@@ -165,7 +165,7 @@ class FirewallManager():
         rule.protocol = "tcp"
         if origin:
             rule.src = origin
-        rule.dst = "127.0.0.1"
+        # rule.dst = "0.0.0.0"
         match = iptc.Match(rule, "tcp")
         match.dport = "%d" % port
         rule.add_match(match)
