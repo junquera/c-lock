@@ -4,6 +4,10 @@ A TOTP based port knocking service. Every time slot, it generates a sequence of 
 
 <!-- https://dashboard.moovly.com -->
 
+![TTS Process](img/tts-process.gif)
+
+> Yeah, I'm not very good with graphics...
+
 ## Table of Contents
 
 
@@ -126,6 +130,7 @@ This is how it shows when a client interacts with the server:
 
 By now, and until I finish a first stable version, I want to control the code. The best way of contribute to this project is apporting ideas and reviewing code. Any help is welcome!
 
+For example, its obvious that I need help with documentation images, design, logo... :blush:
 <!-- ## Credits -->
 
 ## License
