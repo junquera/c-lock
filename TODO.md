@@ -46,17 +46,13 @@
 
 - [x] Cerrar bien y matar threads
 
-- [ ] Maqueta de instalador (Makefile, config...)
-
 - [x] Correct XTABLES dir
 
-- [ ] Test in vm
+- [x] Test in vm
 
 - [ ] Select address in port_manager y firewall_manager
 
-- [ ] Log level in client
-
-- [ ] Opción en server de limpiar iptables
+- [x] Opción en server de limpiar iptables
 
 - [ ] Crear un buen sistema para los thread
 
@@ -67,6 +63,8 @@
 - [ ] Lista de puertos destino
 
 - [ ] Configuración de tiempo de apertura para puertos destino.
+
+- [ ] Maqueta de instalador (Makefile, config...)
 
 <!-- ## Atrribution
 

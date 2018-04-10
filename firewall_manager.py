@@ -181,6 +181,8 @@ class FirewallManager():
         chain.delete_rule(rule)
 
     def clean_firewall(self):
+        log.info("Cleaning firewall rules")
+
         table = iptc.Table(iptc.Table.FILTER)
 
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
