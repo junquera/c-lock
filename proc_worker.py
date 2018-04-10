@@ -14,28 +14,26 @@ def bypass(fa, fb):
 
 class ProcWorker(threading.Thread):
 
-    stay_running = True
-
     def __init__(self, i_q, o_q):
         super(ProcWorker, self).__init__()
+        self._id = uuid.uuid4()
+        print(self._id) 
         self._i = i_q
         self._o = o_q
         self._end_evt = threading.Event()
 
     def run(self):
-        while self.stay_running:
+        while not self._end_evt.is_set():
             evt = self._i.get(True)
             if evt:
                 self.process_evt(evt)
 
-        # TODO Send end event!
-        self._end_evt.set()
 
     def process_evt(self, evt):
         # TODO Send received event!
         if evt.get_id() == ProcWorkerEvent.END:
             log.debug("Received close signal")
-            self.stay_running = False
+            self._end_evt.set()
             self._i.put(None)
 
         pass

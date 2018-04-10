@@ -221,7 +221,6 @@ class FirewallManager():
 # TODO Pasar ar ProcWorker
 class RuleManager(threading.Thread):
 
-    stay_running = True
     rules = {}
 
     def __init__(self, fwm):
@@ -232,12 +231,11 @@ class RuleManager(threading.Thread):
         self.start()
 
     def run(self):
-        while self.stay_running:
+        while not self._end_evt.is_set():
             self.delete_caduced_rules()
             self._end_evt.wait(1)
 
     def close(self):
-        self.stay_running = False
         self._end_evt.set()
         self.delete_all_rules()
 

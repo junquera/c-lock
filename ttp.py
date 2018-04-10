@@ -163,7 +163,7 @@ class TocTocPortsWorker(ProcWorker):
     # TODO Cerrar este thread
     def work(self):
 
-        while self.stay_running:
+        while not self._end_evt.is_set():
             # TODO Tal vez no desde aquí, pero hay que lanzar un evento con los puertos reservados
             self._o.put(Event(TocTocPortsEvent.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
             next_t = self._ttp.next()
