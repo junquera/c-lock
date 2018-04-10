@@ -10,7 +10,7 @@ A TOTP based port knocking service. Every time slot, it generates a sequence of 
 
 ## Table of Contents
 
-
+[TOC]
 
 ## Installation
 
