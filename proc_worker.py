@@ -21,7 +21,6 @@ class ProcWorker(threading.Thread):
         self._i = i_q
         self._o = o_q
         self._end_evt = threading.Event()
-        self.start()
 
     def run(self):
         while self.stay_running:

@@ -66,9 +66,13 @@ def main_server(secret, slot, forbidden):
     b.add_client(ttpq)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
+    fwmw.start()
+    pmw.start()
+    ttpw.start()
+    b.start()
+
     # TODO Refactor de este método
-    def end(*args):
-        signum = args[0]
+    def end(signum, *args):
         log.warning('Signal handler called with signal %s' % signum)
         bq.put(Event(ProcWorkerEvent.END, None))
         retry = 0
