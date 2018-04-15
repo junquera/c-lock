@@ -36,23 +36,9 @@
 
 - [ ] Cómo evitar segmentation fault.
 
-### Para versión 0.0.1 (alpha-1)
+- [ ] Time with NTP
 
-- [x] README
-
-- [x] Arg parser
-
-- [x] Main en condiciones
-
-- [x] Cerrar bien y matar threads
-
-- [x] Correct XTABLES dir
-
-- [x] Test in vm
-
-- [x] Select address in port_manager
-
-- [x] Opción en server de limpiar iptables
+- [ ] Project reestructure
 
 ### Para versión 0.0.2 (alpha-2)
 
