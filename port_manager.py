@@ -23,9 +23,10 @@ class KnockablePort():
 
 class PortManager():
 
-    def __init__(self):
+    def __init__(self, address):
         self._sockets = []
         self._threads = []
+        self._address = address
 
     def wait_and_listen(self, kp, evt):
 
@@ -69,7 +70,7 @@ class PortManager():
     def open_socket(self, port):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind(('0.0.0.0', port))
+            s.bind((self._address, port))
             s.listen(5)
             return s
         except socket.error as e:

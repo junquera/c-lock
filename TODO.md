@@ -50,13 +50,15 @@
 
 - [x] Test in vm
 
-- [ ] Select address in port_manager y firewall_manager
+- [x] Select address in port_manager
 
 - [x] Opción en server de limpiar iptables
 
-- [ ] Crear un buen sistema para los thread
-
 ### Para versión 0.0.2 (alpha-2)
+
+- [ ] Select interface in firewall_manager
+
+- [ ] Intentar mejorar el sistema de threads
 
 - [ ] YAML config
 

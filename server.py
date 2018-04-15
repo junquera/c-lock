@@ -26,7 +26,7 @@ def check_environment():
 
 
 # TODO Sacar a una clase y hacer el main con arg_parser
-def main_server(secret, slot, forbidden):
+def main_server(secret, slot, forbidden, address):
 
     try:
         check_environment()
@@ -57,7 +57,7 @@ def main_server(secret, slot, forbidden):
 
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManager()
+    pm = PortManager(address)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
     ttp = TocTocPorts(secret, forbidden=forbidden)
@@ -162,8 +162,9 @@ def main():
         secret = args.secret
         slot = args.slot
         forbidden_ports = args.forbidden
+        address = args.address
 
-        main_server(secret, slot, forbidden_ports)
+        main_server(secret, slot, forbidden_ports, address)
 
 
 if __name__ == '__main__':
