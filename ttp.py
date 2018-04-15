@@ -1,20 +1,17 @@
+from proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
 import totp
 import time
+import uuid
+import threading
+import logging
 
-def bytes2int(b):
-    return int.from_bytes(b, byteorder='big', signed=False)
-
-# TODO Threading & sockets!
-# import threading, socket
-
-class Last(Exception):
-    pass
+log = logging.getLogger(__name__)
 
 class PortList():
 
     def __init__(self, l):
         self._l = l
-        self.actual = 0
+        self._actual = 0
 
 
     def actual(self):
@@ -33,7 +30,7 @@ class PortList():
     def prev(self):
 
         if len(0 <= self._actual):
-            raise Last()
+            return -1
 
         n = self._l[self._actual]
         self._actual -= 1
@@ -44,7 +41,6 @@ class PortList():
 
     def reset(self):
         self._actual = 0
-
 
 class TocTocPorts():
 
@@ -71,7 +67,14 @@ class TocTocPorts():
     def gen_ports(self, val):
         values = []
         for i in range(self._n_ports):
-            aux = bytes2int(val[2*i:(2*i)+2])
+            aux = totp.bytes2int(val[2*i:(2*i)+2])
+
+            min_port = (2 << 10) + 1
+            max_port = 2 << 13
+
+            # Value between min_port and max_port, from 2^16 values
+            aux = int(min_port + (max_port - min_port) * float(aux) / (2 << 16))
+
             if aux < 1024:
                 aux += 1024
             while aux in self._forbidden or aux in values or aux == self._destination:
@@ -123,13 +126,18 @@ class TocTocPorts():
         valn = totp.totp(self._secret, tcn)
         portsn = self.gen_ports(valn)
 
-        return portsn
+        return PortList(portsn)
 
     def __str__(self):
+        def row(values):
+            return "| " + ("{:<15}| "*len(values)).format(*values) + "\n"
+
         res = ''
-        banner = "N\tPrev\t\tActu\t\tNext\n"
+        banner = row(["N", "Prev", "Actu", "Next"]) # "N\tPrev\t\tActu\t\tNext\n"
+        res += ("-" * (len(banner) - 2))
+        res += "\n"
         res += (banner)
-        res += ("-" * len(banner))
+        res += ("-" * (len(banner) - 2))
         res += "\n"
 
         ports = self.get_all()
@@ -138,93 +146,35 @@ class TocTocPorts():
         n = ports['n'].get_values()
 
         for port in range(len(p)):
-            res += ("%d\t%d\t\t%d\t\t%d\n" % (port, p[port], a[port], n[port]))
-        res += ("-" * len(banner))
+            res += (row((port, p[port], a[port], n[port])))
+        res += ("-" * (len(banner) - 2))
         res += "\n"
 
+        res += " [*] NEXT_SLOT: %ds\n" % self.next()
         return res
 
-def manage_socket(s, next):
-    pass
+class TocTocPortsWorker(ProcWorker):
 
-import socket # TODO Reemplazar por https://docs.python.org/2/library/asyncore.html ? Por el método accept
-import threading
-
-class PortManager():
-
-    def __init__(self, ttp):
+    def __init__(self, i_q, o_q, ttp):
+        super(TocTocPortsWorker, self).__init__(i_q, o_q)
         self._ttp = ttp
-        self._sockets = []
+        threading.Thread(target=self.work).start()
 
-    def wait_and_listen(self, s):
-        # TODO ASYNC - asyncio
-        p = s.getsockname()[1]
-        while 1:
-            try:
-                sock, addr = s.accept()
-                print("New connection to %d from %s" %(p, addr[1]))
-                sock.close()
-            except:
-                pass
+    # TODO Cerrar este thread
+    def work(self):
 
-    def open(self):
-        self._ports = self._ttp.get_actual()
-        print("Abriendo")
+        while not self._end_evt.is_set():
+            # TODO Tal vez no desde aquí, pero hay que lanzar un evento con los puertos reservados
+            self._o.put(Event(TocTocPortsEvent.NEW_SLOT, {'port_list': self._ttp.get_actual()}))
+            next_t = self._ttp.next()
+            log.debug("Next slot in %ds" % next_t)
+            self._end_evt.wait(next_t)
 
-        for port in self._ports.get_values():
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._sockets.append(s)
-            print("Opening %d" % port)
-            s.bind(('0.0.0.0', port))
-            s.listen(1)
-            threading.Thread(target=self.wait_and_listen, args=(s,)).start()
+        log.debug("Fin del thread de TocTocPorts")
 
-    def close_socket(self, s):
-        try:
-            s.close()
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(s.getsockname())
-        except:
-            pass
-    def close(self):
+    def process_evt(self, evt):
 
-        print("Cerrando")
-        while len(self._sockets):
-            s = self._sockets.pop()
-            print("Closing %d" % s.getsockname()[1])
-            self.close_socket(s)
+        super(TocTocPortsWorker, self).process_evt(evt)
 
-    def reset(self):
-        self.close()
-        self.open()
-
-class FirewallManager():
-    pass
-
-# TODO https://github.com/ldx/python-iptables
-# TODO https://docs.python.org/3/library/argparse.html
-# TODO https://twistedmatrix.com/trac/ || https://docs.python.org/3/library/signal.html
-def main():
-
-    slot = 30
-
-    secret = totp.gen_secret()
-
-    # TODO Delete after debug
-    secret = '874895c82728d55c3e8e62c449954e1c2ee8d364f3bc953e230c23be452def7119b3c59d4be21799'
-    print("Secret: %s" % secret)
-
-    ttp = TocTocPorts(secret)
-
-    pm = PortManager(ttp)
-
-    # fwm = FirewallManager()
-
-    while 1:
-        pm.open()
-        print("Abierto")
-        time.sleep(ttp.next())
-        pm.close()
-        print("Cerrado")
-
-if __name__ == '__main__':
-    main()
+        if evt.get_id() == PortManagerEvent.LAST_PORT:
+            self._o.put(Event(TocTocPortsEvent.LAST_PORT, {'port': self._ttp.get_destination(), 'address': evt.get_value()['address']}))

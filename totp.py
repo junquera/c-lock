@@ -7,6 +7,9 @@ sha_block_size = 64
 opad = b'k'* sha_block_size
 ipad = b'm'* sha_block_size
 
+def bytes2int(b):
+    return int.from_bytes(b, byteorder='big', signed=False)
+
 def encode(x):
     if type(x) == bytes:
         return x
