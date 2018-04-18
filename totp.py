@@ -4,8 +4,8 @@ import uuid
 
 sha_block_size = 64
 
-opad = b'k'* sha_block_size
-ipad = b'm'* sha_block_size
+opad = b'\x5c' * sha_block_size
+ipad = b'\x36' * sha_block_size
 
 def bytes2int(b):
     return int.from_bytes(b, byteorder='big', signed=False)
