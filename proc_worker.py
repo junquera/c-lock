@@ -36,8 +36,6 @@ class ProcWorker(threading.Thread):
             self._end_evt.set()
             self._i.put(None)
 
-        pass
-
 
 class Broker(ProcWorker):
 
