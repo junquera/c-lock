@@ -6,6 +6,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 class KnockablePort():
 
     def __init__(self, socket, next_port):
@@ -102,7 +103,6 @@ class PortManager():
             else:
                 self.notify_error_opening_socket()
                 break
-
 
     def notify_socket_closed(self, s_addr):
         log.debug("Closing socket on port %d" % (s_addr[1]))
