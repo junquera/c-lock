@@ -17,7 +17,7 @@ def check_environment():
 
     try:
         import iptc
-    except:
+    except Exception as e:
 
         if 'XTABLES_LIBDIR' not in os.environ:
             os.environ['XTABLES_LIBDIR'] = '/usr/lib/x86_64-linux-gnu/xtables'
@@ -33,12 +33,6 @@ def main_server(secret, slot, forbidden, address):
     except Exception as e:
         log.error(e)
         exit(-1)
-
-    slot = slot
-
-    secret = secret
-
-    forbidden = forbidden
 
     log.debug("Secret: %s" % secret)
 

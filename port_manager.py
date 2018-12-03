@@ -1,12 +1,11 @@
-import uuid
 import socket
 import threading
 from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, TocTocPortsEvent, PortManagerEvent
-from ttp import TocTocPortsWorker
 
 import logging
 
 log = logging.getLogger(__name__)
+
 
 class KnockablePort():
 
@@ -23,7 +22,7 @@ class KnockablePort():
 
 class PortManager():
 
-    def __init__(self, address):
+    def __init__(self, address='0.0.0.0'):
         self._sockets = []
         self._threads = []
         self._address = address
@@ -65,7 +64,6 @@ class PortManager():
 
     def notify_error_opening_socket(self):
         self.close()
-        pass
 
     def open_socket(self, port):
         try:
@@ -106,7 +104,6 @@ class PortManager():
                 self.notify_error_opening_socket()
                 break
 
-
     def notify_socket_closed(self, s_addr):
         log.debug("Closing socket on port %d" % (s_addr[1]))
 
@@ -120,7 +117,7 @@ class PortManager():
     def close_thread(self, evt):
         try:
             evt.set()
-        except:
+        except Exception as e:
             pass
 
     def unlock_threads(self):
@@ -128,7 +125,7 @@ class PortManager():
             try:
                 evt = self._threads.pop()
                 self.close_thread(evt)
-            except:
+            except Exception as e:
                 pass
 
     def close_sockets(self):
@@ -138,7 +135,7 @@ class PortManager():
                 kp = self._sockets.pop()
                 s = kp.get_socket()
                 self.close_socket(s)
-            except:
+            except Exception as e:
                 pass
 
     def close(self):
@@ -147,7 +144,7 @@ class PortManager():
 
     def reset(self, port_list):
         self.close()
-        self.open()
+        self.open(port_list)
 
 
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
