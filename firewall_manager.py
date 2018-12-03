@@ -1,15 +1,13 @@
-from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
-from ttp import TocTocPortsWorker
-from port_manager import PortManagerWorker
+from proc_worker import ProcWorker, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
 import uuid
 import logging
 import threading
 import time
 import iptc
 
-import os
 
 log = logging.getLogger(__name__)
+
 
 # GUIDE: https://github.com/ldx/python-iptables
 class FirewallManager():
