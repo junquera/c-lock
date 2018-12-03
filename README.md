@@ -1,5 +1,6 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/alerts/
 )
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/context:python)
 
 # toc-toc-ssh
 
