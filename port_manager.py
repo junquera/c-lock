@@ -1,8 +1,6 @@
-import uuid
 import socket
 import threading
 from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, TocTocPortsEvent, PortManagerEvent
-from ttp import TocTocPortsWorker
 
 import logging
 
@@ -23,7 +21,7 @@ class KnockablePort():
 
 class PortManager():
 
-    def __init__(self, address):
+    def __init__(self, address='0.0.0.0'):
         self._sockets = []
         self._threads = []
         self._address = address
@@ -65,7 +63,6 @@ class PortManager():
 
     def notify_error_opening_socket(self):
         self.close()
-        pass
 
     def open_socket(self, port):
         try:
@@ -147,7 +144,7 @@ class PortManager():
 
     def reset(self, port_list):
         self.close()
-        self.open()
+        self.open(port_list)
 
 
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
