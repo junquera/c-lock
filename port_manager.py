@@ -117,7 +117,7 @@ class PortManager():
     def close_thread(self, evt):
         try:
             evt.set()
-        except:
+        except Exception as e:
             pass
 
     def unlock_threads(self):
@@ -125,7 +125,7 @@ class PortManager():
             try:
                 evt = self._threads.pop()
                 self.close_thread(evt)
-            except:
+            except Exception as e:
                 pass
 
     def close_sockets(self):
@@ -135,7 +135,7 @@ class PortManager():
                 kp = self._sockets.pop()
                 s = kp.get_socket()
                 self.close_socket(s)
-            except:
+            except Exception as e:
                 pass
 
     def close(self):

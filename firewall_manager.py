@@ -23,19 +23,19 @@ class FirewallManager():
         # Crear chain
         try:
             table.create_chain("toc-toc-ssh-unmanaged")
-        except:
+        except Exception as e:
             log.debug("toc-toc-ssh-unmanaged exists!")
 
         # Crear chain
         try:
             table.create_chain("toc-toc-ssh")
-        except:
+        except Exception as e:
             log.debug("toc-toc-ssh exists!")
 
         # Crear última chain
         try:
             table.create_chain("toc-toc-ssh-reject")
-        except:
+        except Exception as e:
             log.debug("toc-toc-ssh-reject exists!")
 
         # TODO ¿Debería venir desde ACCEPT?
@@ -133,7 +133,7 @@ class FirewallManager():
         # TODO Puede servir para evitar repetidos
         # try:
         #     self.delete_rule(rule)
-        # except:
+        # except Exception as e:
         #     pass
 
         chain.insert_rule(rule)
