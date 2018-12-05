@@ -35,7 +35,7 @@ def xor(a, b):
     return c
 
 def hmac(K, m):
-
+    # Rewritten according to RFC 2104
     if len(K) > block_size:
         k = hash_alg(K).digest()
     else:
