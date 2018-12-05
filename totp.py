@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from hashlib import sha1
+from hashlib import sha256 as hash_alg
 import uuid
 
-sha_block_size = 64
+block_size = hash_alg().block_size
 
-opad = b'\x5c' * sha_block_size
-ipad = b'\x36' * sha_block_size
+opad = bytes((x ^ 0x5c) for x in range(2**8))
+ipad = bytes((x ^ 0x36) for x in range(2**8))
 
 def bytes2int(b):
     return int.from_bytes(b, byteorder='big', signed=False)
@@ -26,11 +26,8 @@ def xor(a, b):
 
     c = b''
 
-    while len(a) > len(b):
-        b = b'\x00' + b
-
-    while len(b) < len(a):
-        a = b'\x00' + a
+    a = a.ljust(len(b), '\0')
+    b = b.ljust(len(a), '\0')
 
     for i in range(len(a)):
         c += b'%c' % (a[i] ^ b[i])
@@ -39,24 +36,24 @@ def xor(a, b):
 
 def hmac(K, m):
 
-    if len(K) > sha_block_size:
-        k = sha1(K).digest()
+    if len(K) > block_size:
+        k = hash_alg(K).digest()
     else:
         k = K
 
-    while len(k) < sha_block_size:
-        k = b'\x00' + k
+    # encode(k) because Key must always be bytes
+    k = encode(k).ljust(block_size, b'\0')
 
-    o_key_pad = xor(k, opad)
-    i_key_pad = xor(k, ipad)
+    o_key_pad = k.translate(opad) # xor(k, k.translate(opad))
+    i_key_pad = k.translate(ipad) # xor(k, k.translate(ipad))
 
-    a = sha1(encode(i_key_pad))
-    a.update(encode(m))
+    inner = hash_alg(encode(i_key_pad))
+    outer = hash_alg(encode(o_key_pad))
 
-    b = sha1(encode(o_key_pad))
-    b.update(encode(a.digest()))
+    inner.update(encode(m))
+    outer.update(encode(inner.digest()))
 
-    return b.digest()
+    return outer.digest()
 
 
 def hotp(K, C):
@@ -76,4 +73,4 @@ def int_2_str(i):
     return "%c%c%c%c" % (a, b, c, d)
 
 def gen_secret():
-    return "%s%s" % (sha1(uuid.uuid4().bytes).hexdigest(), sha1(uuid.uuid4().bytes).hexdigest())
+    return "%s%s" % (hash_alg(uuid.uuid4().bytes).hexdigest(), hash_alg(uuid.uuid4().bytes).hexdigest())
