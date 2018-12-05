@@ -1,18 +1,17 @@
 from proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
 import totp
 import time
-import uuid
 import threading
 import logging
 
 log = logging.getLogger(__name__)
+
 
 class PortList():
 
     def __init__(self, l):
         self._l = l
         self._actual = 0
-
 
     def actual(self):
         return self._l[self._actual]

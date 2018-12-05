@@ -23,7 +23,7 @@ def toc_ports(ttp, address):
             print("Connection to %d" % n)
             s.connect((address, n))
             s.close()
-        except:
+        except Exception as e:
             if retry > 3:
                 log.error("Max retries! Port %d (at %s) doesnt work" % (n, address))
                 return
