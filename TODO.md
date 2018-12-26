@@ -40,6 +40,8 @@
 
 - [ ] Project reestructure
 
+- [ ] Ajustar a RFC-6238
+
 ### Para versión 0.0.2 (alpha-2)
 
 - [ ] Select interface in firewall_manager
