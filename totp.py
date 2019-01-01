@@ -60,7 +60,9 @@ def hotp(K, C):
     return hmac(K.encode(), C.encode())
 
 def totp(K, TC):
-    return hotp(K, int_2_str(TC))
+    tcs = int_2_str(TC)
+    res = hotp(K, tcs)
+    return res
 
 
 def int_2_str(i):
