@@ -50,8 +50,12 @@ class TocTocPorts():
         self._forbidden = forbidden
         self._destination = destination
 
-        if n_ports > 20:
-            raise Exception("Error, max ports: %d" % 20)
+        if n_ports < 1:
+            raise Exception("Error, at least %d ports needed" % 1)
+
+        if n_ports > 6:
+            raise Exception("Error, max ports: %d" % 6)
+
 
         self._n_ports = n_ports
 
@@ -62,11 +66,18 @@ class TocTocPorts():
         self._n = ports['n']
         # time.sleep(ns)
 
-    # 1 < n < 10
+    # 0 <= val < 1000000 --> 6 digits (24 bytes)
+    # 1024 < port < 10240
+    # 3 <= n_ports <= 6
     def gen_ports(self, val):
+
         values = []
+
+        aux = val
         for i in range(self._n_ports):
-            aux = totp.bytes2int(val[2*i:(2*i)+2])
+
+            aux = totp.hotp(self._secret, aux)
+            print(aux)
 
             min_port = (2 << 10) + 1
             max_port = 2 << 13
@@ -76,8 +87,10 @@ class TocTocPorts():
 
             if aux < 1024:
                 aux += 1024
+
             while aux in self._forbidden or aux in values or aux == self._destination:
                 aux += 1
+
             values.append(aux)
         return values
 
@@ -107,6 +120,7 @@ class TocTocPorts():
 
         tcp = self.last() - self._slot
         valp = totp.totp(self._secret, tcp)
+
         portsp = self.gen_ports(valp)
 
         return PortList(portsp)
