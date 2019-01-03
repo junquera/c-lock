@@ -1,10 +1,3 @@
 # RFC 6238
 
-## 1546379075
-
-792756
-
-## 1546379105
-
-240229
-
+Feature for compliant with OTP/HOTP/TOTP RFCs.
