@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] Ajustar a RFC-6238
+
 - [ ] Make it work with previous/next time slots for clock issues.
 
 - [ ] Al capturar error fatal, limpiar las reglas y dejar abierto el puerto de destino
@@ -39,8 +41,6 @@
 - [ ] Time with NTP
 
 - [ ] Project reestructure
-
-- [ ] Ajustar a RFC-6238
 
 ### Para versión 0.0.2 (alpha-2)
 

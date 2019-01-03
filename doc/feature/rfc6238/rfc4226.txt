@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>IETF  | Internet Engineering Task Force</title>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Twitter summary card - see https://dev.twitter.com/cards/types/summary -->
+        <!--  and https://dev.twitter.com/cards/getting-started -->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@ietf" />
+        <meta name="twitter:title" content="Home" />
+        <meta name="twitter:description" content="">
+        <meta name="twitter:image" content="http://www7.ietf.org/media/images/ietflogotrans.original.png">
+
+        <!--facebook opengraph tags-->
+        <meta property="fb:app_id" content="159756941186350" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="/" />
+        <meta property="og:title" content="Home" />
+        <meta property="og:image" content="http://www7.ietf.org/media/images/ietflogotrans.original.png" />
+        <meta property="og:description" content="" />
+        <meta property="og:site_name" content="IETF" />
+
+        
+
+        <link rel="stylesheet" href="/static/CACHE/css/d37b90ddae1a.css" type="text/css" />
+
+        
+        <script>
+            document.write('<link rel="stylesheet" href="/static/CACHE/css/5be91fad6389.css" type="text/css" />');
+        </script>
+
+        
+
+        <script src="/static/js/vendor/modernizr-2.6.2.min.42306a279a9e.js"></script>
+
+    </head>
+
+    <body class="template-home-page">
+
+        
+
+        
+
+<header id="show-search">
+    <div class="nav-search-top">
+        <form action="/search/" method="get" name="search">
+            <label for="nav-search" style="display: none;">Search</label>
+            <input id="nav-search" aria-label="Search" name="query" type="text" placeholder="Search" required="">
+            <button class="" type="submit">Go</button>
+        </form>
+    </div>
+
+    <div class="container" id="menu-open">
+        <div class="cf">
+            <div class="icon-mobile hamburger feedback">
+                <a title="open menu" href="#menu-open" class="open-menu click">
+                    <span class="icon ion-android-menu"></span>
+                </a>
+                <a title="close menu" href="#menu-closed" class="close-menu click">
+                    <span class="icon ion-android-menu"></span>
+                </a>
+            </div>
+
+            <!-- Mobile search -->
+            <div class="icon-mobile feedback search-open">
+                <a href="#show-search" class="click show-search">
+                    <span class="icon ion-search"></span>
+                    <span>Search</span>
+                </a>
+                <a href="#" class="click hide-search">
+                    <span class="icon ion-search"></span>
+                    <span>Search</span>
+                </a>
+            </div>
+            <!-- Mobile search end -->
+        </div>
+
+        <div class="logo-holder">
+            <div class="logo">
+                <a href="/"><img src="/static/img/ietf-logo.e4b6ca0dd271.gif" alt="IETF logo"></a>
+            </div>
+        </div>
+
+        <div class="nav-holder">
+            <!-- Hides sub nav on mobile / shows on desktop-->
+            <div class="mobile-tablet">
+                <ul class="nav-sub">
+                    <li>
+                        <a href="/blog/"> News &amp; blog</a>
+                        <ul>
+                            
+                                <li><a href="/blog/?primary_topic=6">Blog</a></li>
+                            
+                                <li><a href="/blog/?primary_topic=5">News</a></li>
+                            
+                                <li><a href="/blog/?primary_topic=7">IESG Statements</a></li>
+                            
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/contact/">Contact</a>
+                    </li>
+                    <li class="search search-open">
+                        <a href="#show-search" class="click show-search">
+                            <span class="icon ion-search"></span>
+                            <span>Search</span>
+                        </a>
+                        <a href="#" class="click hide-search">
+                            <span class="icon ion-search"></span>
+                            <span>Search</span>
+                        </a>
+                    </li>
+                    <li class="more">
+                        <a href="/links/">Tools</a>
+                        <ul>
+                            
+                                <li><a href="/links/">Quick links</a></li>
+                            
+                                <li><a href="https://datatracker.ietf.org">IETF Datatracker</a></li>
+                            
+                                <li><a href="https://mailarchive.ietf.org/arch/">Email list archive search</a></li>
+                            
+                                <li><a href="/how/meetings/104/">IETF 104 Prague</a></li>
+                            
+                                <li><a href="/chairs/">WG chair resources</a></li>
+                            
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <nav>
+                <ul>
+                    
+                        <li>
+                            <a  href="/about/">About</a>
+                            
+                                <ul>
+                                    
+                                        <li><a  href="/about/mission/">Mission and principles</a></li>
+                                    
+                                        <li><a  href="/about/who/">Who we are</a></li>
+                                    
+                                        <li><a  href="/about/groups/">Groups</a></li>
+                                    
+                                        <li><a  href="/about/participate/">Participate in the IETF</a></li>
+                                    
+                                        <li><a  href="/about/support/">Support the IETF</a></li>
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                        <li>
+                            <a  href="/topics/">Topics of interest</a>
+                            
+                                <ul>
+                                    
+                                        <li><a  href="/topics/netmgmt/">Automated network management</a></li>
+                                    
+                                        <li><a  href="/topics/iot/">The Internet of Things</a></li>
+                                    
+                                        <li><a  href="/topics/transport/">New transport technology</a></li>
+                                    
+                                        <li><a  href="/topics/areas/">IETF Areas</a></li>
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                        <li>
+                            <a  href="/how/">How we work</a>
+                            
+                                <ul>
+                                    
+                                        <li><a  href="/how/wgs/">Working groups</a></li>
+                                    
+                                        <li><a  href="/how/lists/">Email lists</a></li>
+                                    
+                                        <li><a  href="/how/meetings/">Meetings and events</a></li>
+                                    
+                                        <li><a  href="/how/runningcode/">Running code</a></li>
+                                    
+                                        <li><a  href="/how/tools/">Online tools</a></li>
+                                    
+                                        <li><a  href="/how/bofs/">Birds of a Feather</a></li>
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                        <li>
+                            <a  href="/standards/">Internet standards</a>
+                            
+                                <ul>
+                                    
+                                        <li><a  href="/standards/rfcs/">RFCs</a></li>
+                                    
+                                        <li><a  href="/standards/ids/">Internet-Drafts</a></li>
+                                    
+                                        <li><a  href="/standards/ipr/">Intellectual property rights</a></li>
+                                    
+                                        <li><a  href="/standards/process/">Standards process</a></li>
+                                    
+                                </ul>
+                            
+                        </li>
+                    
+                </ul>
+            </nav>
+
+            <!-- Hides sub nav on desktop / shows on mobile-->
+                <ul class="nav-sub mobile-show-tab">
+                    <li>
+                        <a href="/blog/"> News &amp; blogs</a>
+                        <ul>
+                            
+                                <li><a href="/blog/?primary_topic=6">Blog</a></li>
+                            
+                                <li><a href="/blog/?primary_topic=5">News</a></li>
+                            
+                                <li><a href="/blog/?primary_topic=7">IESG Statements</a></li>
+                            
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/contact/">Contact</a>
+                    </li>
+                    <li class="search search-open">
+                        <a href="#show-search" class="click show-search">
+                            <span class="icon ion-search"></span>
+                            <span>Search</span>
+                        </a>
+                        <a href="#" class="click hide-search">
+                            <span class="icon ion-search"></span>
+                            <span>Search</span>
+                        </a>
+                    </li>
+                    <li class="more">
+                        <a href="/links/">Tools</a>
+                        <ul>
+                            
+                                <li><a href="/links/">Quick links</a></li>
+                            
+                                <li><a href="https://datatracker.ietf.org">IETF Datatracker</a></li>
+                            
+                                <li><a href="https://mailarchive.ietf.org/arch/">Email list archive search</a></li>
+                            
+                                <li><a href="/how/meetings/104/">IETF 104 Prague</a></li>
+                            
+                                <li><a href="/chairs/">WG chair resources</a></li>
+                            
+                        </ul>
+                    </li>
+                </ul>
+        </div>
+    </div>
+
+</header>
+
+
+        
+
+    <div class="body-subtle">
+
+        
+
+        <div class="header-image-full main-feature rule-desktop" style="background-image: url(/media/images/_MG_8435.max-4000x4000.jpg);">
+            <div class="container">
+                <h1>IETF Hackathon in Bangkok</h1>
+                <p class="intro">Just when you thought it could not get any better, the IETF Hackathon reached new heights.</p>
+              
+                <a href="/blog/ietf-hackathon-bangkok-jumpstarts-innovation/" class="btn btn-outline-white btn-big">Read more about how the IETF Hackathon jumpstarted innovation</a>
+              
+            </div>
+        </div>
+
+        <!-- Events -->
+        <div class="rule-blue body">
+            <div class="container">
+                <div class="two-col">
+                  <div>
+                    <h2 class="home-title">Upcoming events</h2>
+                    <ul class="event-list">
+                      
+                        
+                          
+
+  <li>
+    
+    <img src="/media/images/35549429813_51788e2877_k.height-245.jpg" alt="Charles Bridge photo by Brian Campbell">
+    <div class="text-holder">
+      <h3><a href="/how/meetings/104/">IETF 104 Prague</a></h3>
+      <p>IETF 104 starts Saturday 23 March and runs through Friday afternoon, 29 March.</p>
+      <small>
+        <span></span>
+        <span>Prague, Czech Republic</span>
+        
+      </small>
+    </div>
+  </li>
+
+                        
+                      
+                      
+                        
+                          
+
+  <li>
+    
+    <img src="/media/images/42660825015_ba1ea20847_k.height-245.jpg" alt="Montreal harbor">
+    <div class="text-holder">
+      <h3><a href="/how/meetings/105/">IETF 105 Montreal</a></h3>
+      <p>IETF 105 starts Saturday 20 July and runs through Friday afternoon, 26 July.</p>
+      <small>
+        <span></span>
+        <span>Montreal, Quebec, Canada</span>
+        
+      </small>
+    </div>
+  </li>
+
+                        
+                      
+                    </ul>
+                    <a class="default" href="/how/meetings/"><div class="btn btn-secondary-outline sml">All events</div></a>
+                  </div>
+                    <div>
+                        <h2 class="home-title">What's new?</h2>
+                        <ul class="teaser-blog">
+                          
+                            <li>
+                                <h3><a href="/blog/ietf-hackathon-bangkok-jumpstarts-innovation/">IETF Hackathon in Bangkok Jumpstarts Innovation</a></h3>
+                                <p>Just when you thought it could not get any better, the IETF Hackathon reached new heights, not just in number of participants or projects, but in meaningful contributions to the IETF community and the standardization process.</p>
+                                <small>
+                                    <span class="title"></span>
+                                    <span></span>
+                                    <span>21 Dec 2018</span>
+                                </small>
+                            </li>
+                          
+                            <li>
+                                <h3><a href="/blog/2019-ietf-administration-llc-budget/">The 2019 IETF Administration LLC Budget</a></h3>
+                                <p>The IETF Administration LLC (IETF LLC) Interim Board has approved the 2019 budget as recommended by the IETF Administrative Oversight Committee (IAOC).</p>
+                                <small>
+                                    <span class="title"></span>
+                                    <span></span>
+                                    <span>20 Dec 2018</span>
+                                </small>
+                            </li>
+                          
+                        </ul>
+                        <a class="default" href="/blog/"><div class="btn btn-secondary-outline sml">All news</div></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sign up -->
+        <div class="rule-blue body-no-space">
+            <div class="home-search container">
+                <div class="home-search__item home-search__item--search">
+                    <h2 class="home-title top">Search the IETF email archive</h2>
+                    <p class="home-search__text">Much of the daily work of the IETF is conducted on electronic mailing lists. A new mail archive tool realizing the requirements developed in <a href="https://datatracker.ietf.org/doc/rfc6778/">RFC 6778</a> is now in use:</p>
+                    <div class="standard-form">
+                        <form class="search-mail-list" action="https://mailarchive.ietf.org/arch/search/" method="GET" target="_blank">
+                            <label for="home-search" style="display: none;">Search</label>
+                            <input id="home-search" aria-label="search the email archive" type="text" placeholder="Search the email archive" name="q" required="">
+                            <button class="" type="submit">Go</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="home-search__item home-search__item--data-tracker">
+                    <h2 class="home-title top">Search IETF Datatracker</h2>
+                    <p class="home-search__text">The IETF Datatracker contains data about IETF documents, working groups, meetings, agendas, minutes, presentations, and more:</p>
+                    <div class="standard-form">
+                        <form class="search-mail-list" action="https://datatracker.ietf.org/doc/search/" method="GET" target="_blank">
+                            <label for="search-datatracker" style="display: none;">Search</label>
+
+                            <input id="search-datatracker" aria-label="search datatracker" placeholder="Search datatracker" name="name" type="text">
+                            <button class="" type="submit">Go</button>
+                            <input type="hidden" name="rcs" value="on">
+                            <input type="hidden" name="activedrafts" value="on">
+                            <input type="hidden" name="by" value="group">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="rule-blue body">
+            <!-- Undertstanding process -->
+            <div class="container">
+                <h2 class="home-title">Understanding the Internet Engineering Task Force</h2>
+                <div class="eight">
+                  <div class="jsonly">
+                    <ul class="tab-process">
+                        <li class="first-tab-toggle active">
+                            Working Groups
+                        </li>
+                        <li class="second-tab-toggle">
+                            Request for Comments (RFC<span style="text-transform: lowercase">s</span>)
+                        </li>
+                    </ul>
+                  </div>
+                    <!-- content -->
+                    <!-- first tab content -->
+                    <div class="tab-process-content first-tab active">
+                      <h2 class="nojs">Working groups</h2>
+                      <p>Working Groups are the primary mechanism for development of IETF specifications and guidelines. Working Groups are typically created to address a specific problem or to produce one or more specific deliverables (a guideline, standards specification, etc.).</p>
+                      <ul class="actions">
+                          
+                            <li><a class="default" href="/how/wgs/">See how IETF Working Groups operate</a></li>
+                          
+                        </ul>
+                    </div>
+                    <!-- second tab content -->
+                    <div class="tab-process-content second-tab">
+                      <h2 class="nojs">Request for Comments (RFC<span style="text-transform: lowercase">s</span>)</h2>
+                      <p>The IETF publishes RFCs authored by network operators, engineers, and computer scientists to document methods, behaviors, research, or innovations applicable to the Internet.</p>
+                      <ul class="actions">
+                          
+                            <li><a class="default" href="/standards/rfcs/">Learn more about RFCs</a></li>
+                          
+                        </ul>
+                    </div>
+                </div>
+                <div class="four desktop">
+                    <!-- first tab content -->
+                    <div class="tab-process-content first-tab active">
+                        <ul class="group-list">
+                            <li>
+                              <h3>Featured Working Group</h3>
+                              <div class="standard-snippet">
+    <label>Working Group</label>
+    <h2><a href="https://datatracker.ietf.org/wg/doh">DNS Over HTTPS</a></h2>
+    <p class="push-down">This working group will standardize encodings for DNS queries and responses
+that are suitable for use in HTTPS. This will enable the domain name system to
+function over certain paths where existing...</p>
+    <small>
+        <span class="bold">doh</span>
+        
+            <span>active</span>
+        
+        
+            <span><a class="internal mail" href="mailto:doh@ietf.org">doh@ietf.org</a></span>
+        
+    </small>
+</div>
+
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Second tab content -->
+                    <div class="tab-process-content second-tab">
+                        <ul class="group-list">
+                            <li>
+                              <h3>Featured RFC</h3>
+                              <div class="standard-snippet">
+    <h2><a href="https://datatracker.ietf.org/doc/rfc8484">DNS Queries over HTTPS (DoH)</a></h2>
+    <p class="push-down">This document defines a protocol for sending DNS queries and getting DNS responses over HTTPS.  Each DNS query-response pair is mapped into an HTTP exchange.</p>
+    <small>
+        <span class="bold">RFC 8484</span>
+        <span class="no-border">was:</span>
+        <span><a href="https://datatracker.ietf.org/doc/rfc8484">draft-ietf-doh-dns-over-https</a></span>
+        
+        
+            <span><a class="internal mail" href="mailto:doh@ietf.org">doh@ietf.org</a></span>
+        
+    </small>
+</div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="body-subtle">
+            <!-- Topics of interest -->
+            <div class="container">
+                <h2 class="home-title top center">Topics of interest</h2>
+                <ul class="topics-teaser three-col no-margin-bottom">
+                  
+                    <li>
+                        <a href="/topics/netmgmt/">
+                        
+                          <div class="img-holder">
+                            
+                            <img src="/media/images/all-yang-modules-300x263.max-300x300.jpg" alt="YANG module diagram">
+                          </div>
+                        
+                        <h2>Automated network management</h2>
+                        <p>The IETF is working on standards for automated network management which, as the name implies aims to improve and make more efficient management of networks as they continue increase in size and complexity.</p>
+                        </a>
+                    </li>
+                  
+                    <li>
+                        <a href="/topics/iot/">
+                        
+                          <div class="img-holder">
+                            
+                            <img src="/media/images/things.max-300x300_CJcb1xp.jpg" alt="things">
+                          </div>
+                        
+                        <h2>The Internet of Things</h2>
+                        <p>The Internet of Things is the network of physical objects or &quot;things&quot; embedded with electronics, software, sensors, and connectivity to enable objects to exchange data with the manufacturer, operator and/or other connected devices.</p>
+                        </a>
+                    </li>
+                  
+                    <li>
+                        <a href="/topics/transport/">
+                        
+                          <div class="img-holder">
+                            
+                            <img src="/media/images/quicpic2.max-300x300.jpg" alt="Quicpic2">
+                          </div>
+                        
+                        <h2>New transport technology</h2>
+                        <p>The development of new transport technologies in the IETF provide capabilities that improve the ability of Internet applications to send data over the Internet.</p>
+                        </a>
+                    </li>
+                  
+                </ul>
+                <div class="center">
+                    <a href="/topics/"><div class="btn btn-secondary-line">All topics</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="body-secondary">
+        <div class="container">
+            <div class="body-secondary">
+                <div class="general-CTA">
+                    <div class="text">
+    <h2>Register for IETF 104 in Prague</h2>
+    <p>Join the IETF community as it creates the technologies that power the Internet.</p>
+    <a href="/how/meetings/register/" class="btn btn-primary">Register Here!</a>
+</div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+
+        <footer class="cf">
+    <div class="container">
+        <ul class="links">
+            
+                <li><a href="/llc/">IETF LLC</a></li>
+            
+                <li><a href="https://www.rfc-editor.org">RFC Editor</a></li>
+            
+                <li><a href="https://www.iana.org">IANA</a></li>
+            
+                <li><a href="https://www.iab.org">IAB</a></li>
+            
+                <li><a href="https://www.irtf.org">IRTF</a></li>
+            
+                <li><a href="https://trustee.ietf.org">IETF Trust</a></li>
+            
+                <li><a href="https://www.amsl.com">Secretariat: AMS</a></li>
+            
+                <li><a href="https://www.internetsociety.org">ISOC</a></li>
+            
+                <li><a href="/privacy-statement/">Privacy Statement</a></li>
+            
+                <li><a href="/contact/website/">Website feedback</a></li>
+            
+        </ul>
+    </div>
+</footer>
+
+        <script type="text/javascript" src="/static/CACHE/js/d57d8be90908.js"></script>
+
+        
+    </body>
+</html>
