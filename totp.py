@@ -85,10 +85,10 @@ def hotp(K, I):
     return int(res)
 
 # TC = Time in seconds
-def totp(K, TC):
+def totp(K, TC, n=8):
 
     t = int(TC/30)
-    res = otp(K, t) % 1e8
+    res = otp(K, t) % (10**n)
     return int(res)
 
 def int_2_str(i):
