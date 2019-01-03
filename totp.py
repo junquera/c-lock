@@ -3,6 +3,9 @@
 from hashlib import sha1 as hash_alg
 import uuid
 import codecs
+import time
+
+import base64
 
 block_size = hash_alg().block_size
 
@@ -16,11 +19,11 @@ def encode(x):
     if type(x) == bytes:
         return x
     else:
-        return x.encode()
+        return codecs.encode(x)
 
 def decode(x):
     if type(x) == bytes:
-        return x.decode()
+        return codecs.decode(x)
     else:
         return x
 
@@ -85,7 +88,7 @@ def hotp(K, I):
     return int(res)
 
 # TC = Time in seconds
-def totp(K, TC, n=8):
+def totp(K, TC=int(time.time()), n=6):
 
     t = int(TC/30)
     res = otp(K, t) % (10**n)
@@ -112,8 +115,17 @@ def str2hexs(s):
     res = bytes2hexs(res)
     return res
 
+# Método para utilizar secretos 2fa de webs
+def from_web_secret(s):
+
+    norm = s.replace(' ', '')
+    key = base64.b32decode(norm)
+
+    return codecs.decode(key)
+
 
 if __name__ == '__main__':
+
     K = 0x3132333435363738393031323334353637383930
     S = codecs.decode(codecs.decode("%x" % K, "hex"))
 
