@@ -1,6 +1,10 @@
-import socket
+
+import socket, sys
+from struct import *
 import threading
 from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, TocTocPortsEvent, PortManagerEvent
+
+from client import touch
 
 import logging
 
@@ -27,19 +31,71 @@ class PortManager():
         self._threads = []
         self._address = address
 
-    def wait_and_listen(self, kp, evt):
+        try:
+            self._s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
 
-        s = kp.get_socket()
-        p = s.getsockname()
-        next_port = kp.get_next_port()
+            evt = threading.Event()
+            t = threading.Thread(target=self.wait_and_listen, args=(evt,))
+            self._threads.append(evt)
+            t.start()
 
+        except socket.error:
+            # TODO Send END
+            print( 'Socket could not be created. Error Code : ' + str(msg[0]) + ' Message ' + msg[1])
+            sys.exit()
+
+    def wait_and_listen(self, evt):
+        log.info("wait_and_listen")
         errors = 0
         # TODO Ver por qué no termina el hilo...
         while not evt.is_set():
             try:
-                sock, addr = s.accept()
-                self.notify_connection(p, addr, next_port)
-                self.handle_connection(sock, addr)
+                packet = self._s.recvfrom(65565)
+
+                #packet string from tuple
+                packet = packet[0]
+
+                #take first 20 characters for the ip header
+                ip_header = packet[0:20]
+                # print(ip_header)
+
+                #now unpack them :)
+                iph = unpack('!BBHHHBBH4s4s' , ip_header)
+
+                version_ihl = iph[0]
+                version = version_ihl >> 4
+                ihl = version_ihl & 0xF
+
+                iph_length = ihl * 4
+
+                ttl = iph[5]
+                protocol = iph[6]
+                s_addr = socket.inet_ntoa(iph[8])
+                d_addr = socket.inet_ntoa(iph[9])
+
+                # print 'Version : ' + str(version) + ' IP Header Length : ' + str(ihl) + ' TTL : ' + str(ttl) + ' Protocol : ' + str(protocol) + ' Source Address : ' + str(s_addr) + ' Destination Address : ' + str(d_addr)
+
+                tcp_header = packet[iph_length:iph_length+20]
+
+                #now unpack them :)
+                tcph = unpack('!HHLLBBHHH' , tcp_header)
+
+                source_port = tcph[0]
+                dest_port = tcph[1]
+                sequence = tcph[2]
+                acknowledgement = tcph[3]
+                doff_reserved = tcph[4]
+
+                flags = tcph[5]
+
+                syn = flags & 0b10
+                ack = flags & 0b10000
+                fin = flags & 0b1
+
+                # TODO If is start connection
+                if syn and not ack:
+                    self.notify_connection(s_addr, dest_port)
+
             except Exception as e:
                 if not evt.is_set():
                     log.error("Error on socket: %s" % str(e))
@@ -48,71 +104,34 @@ class PortManager():
                         log.critical("Error on socket: %s" % str(e))
                         break
 
-        log.debug("Fin del thread del socket %s" % str(p))
+        log.info("nor_wait_nor_listen")
 
-    def handle_connection(self, sock, addr):
-        sock.close()
-
-    def notify_first_port(self, p):
-        log.debug("First port: %d" % p)
-
-    def notify_connection(self, p, addr, next_port):
-        if next_port:
-            log.debug("New connection to %d from %s, next step %d" %(p[1], addr[0], next_port))
-        else:
-            log.debug("New connection to %d from %s, open the result!" % (p[1], addr[0]))
-
-    def notify_error_opening_socket(self):
-        self.close()
-
-    def open_socket(self, port):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((self._address, port))
-            s.listen(5)
-            return s
-        except socket.error as e:
-            if e.errno == 98:
-                log.critical("El puerto %d ya está siendo utilizado por otro proceso" % port)
+    def notify_connection(self, addr, port):
+        # TODO Hacer esto con métodos con bloqueos (@lock)
+        if addr in self._active:
+            addr_info = self._active[addr]
+            if port == addr_info['next']:
+                next_n = addr_info['n'] + 1
+                if len(self._port_list) <= next_n:
+                    self.last_port(addr)
+                    del self._active[addr]
+                else:
+                    addr_info['n'] = next_n
+                    addr_info['next'] = self._port_list[next_n]
+                    self._active[addr] = addr_info
             else:
-                log.critical("Error al abrir puerto %d: %s" % (port, e))
+                del self._active[addr]
+        else:
+            if self._port_list[0] == port:
+                self._active[addr] = dict(next=self._port_list[1], n=1)
 
-        return None
+    def last_port(self, addr):
+        log.info("%s reached last port" % (addr))
+
 
     def open(self, port_list):
-
-        n = port_list.next()
-
-        if n:
-            self.notify_first_port(n)
-
-        while n:
-            port = n
-            n = port_list.next()
-
-            log.info("Opening %d" % port)
-
-            s = self.open_socket(port)
-            if s:
-                kp = KnockablePort(s, n)
-                self._sockets.append(kp)
-                evt = threading.Event()
-                t = threading.Thread(target=self.wait_and_listen, args=(kp, evt,))
-                self._threads.append(evt)
-                t.start()
-            else:
-                self.notify_error_opening_socket()
-                break
-
-    def notify_socket_closed(self, s_addr):
-        log.debug("Closing socket on port %d" % (s_addr[1]))
-
-    def close_socket(self, s):
-        try:
-            self.notify_socket_closed(s.getsockname())
-            s.shutdown(socket.SHUT_RDWR)
-        except Exception as e:
-            pass
+        self._active = {}
+        self._port_list = port_list
 
     def close_thread(self, evt):
         try:
@@ -128,23 +147,11 @@ class PortManager():
             except Exception as e:
                 pass
 
-    def close_sockets(self):
-        # Copy self._sockets
-        while len(self._sockets):
-            try:
-                kp = self._sockets.pop()
-                s = kp.get_socket()
-                self.close_socket(s)
-            except Exception as e:
-                pass
-
     def close(self):
         self.unlock_threads()
-        self.close_sockets()
-
-    def reset(self, port_list):
-        self.close()
-        self.open(port_list)
+        # Knock a port for stopping the socket thread
+        touch(self._address, 12345)
+        self._s.close()
 
 
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
@@ -159,25 +166,13 @@ class PortManagerWorker(ProcWorker):
 
         self._pm = pm
 
-        self._pm.notify_socket_closed = bypass(self._pm.notify_socket_closed, self.notify_socket_closed)
         self._pm.notify_connection = bypass(self._pm.notify_connection, self.notify_connection)
-        self._pm.notify_first_port = bypass(self._pm.notify_first_port, self.notify_first_port)
-        self._pm.notify_error_opening_socket = bypass(self._pm.notify_error_opening_socket, self.notify_error_opening_socket)
 
-    def notify_error_opening_socket(self):
-        self._o.put(Event(PortManagerEvent.ERROR_OPENING_SOCKET, None))
+    def notify_connection(self, addr, port):
+        self._o.put(Event(PortManagerEvent.NEW_CONNECTION, {'port': port, 'address': addr}))
 
-    def notify_first_port(self, p):
-        self._o.put(Event(PortManagerEvent.FIRST_PORT, {'port': p}))
-
-    def notify_socket_closed(self, s_addr):
-        self._o.put(Event(PortManagerEvent.CLOSING_SOCKET, {'port': s_addr[1]}))
-
-    def notify_connection(self, p, addr, next_port):
-        if next_port:
-            self._o.put(Event(PortManagerEvent.NEW_CONNECTION, {'port': p[1], 'address': addr[0], 'next': next_port}))
-        else:
-            self._o.put(Event(PortManagerEvent.LAST_PORT, {'port': p[1], 'address': addr[0]}))
+    def last_port(self, addr):
+            self._o.put(Event(PortManagerEvent.LAST_PORT, dict(address=address)))
 
     def process_evt(self, evt):
         super(PortManagerWorker, self).process_evt(evt)
@@ -186,5 +181,5 @@ class PortManagerWorker(ProcWorker):
             self._pm.close()
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
-            self._pm.close()
-            self._pm.open(evt.get_value()['port_list'])
+            port_list = evt.get_value()['port_list'].get_values()
+            self._pm.open(port_list)

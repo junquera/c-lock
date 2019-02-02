@@ -10,6 +10,16 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
+def touch(address, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0)
+    try:
+        log.info("Touching %d" % port)
+        s.connect((address, port))
+        s.close()
+    except Exception as e:
+        pass
+
 def toc_ports(ttp, address):
 
     values = ttp.get_actual()
@@ -17,22 +27,10 @@ def toc_ports(ttp, address):
     retry = 0
     n = values.next()
     while n:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(1)
-        try:
-            print("Connection to %d" % n)
-            s.connect((address, n))
-            s.close()
-        except Exception as e:
-            if retry > 3:
-                log.error("Max retries! Port %d (at %s) doesnt work" % (n, address))
-                return
-            retry += 1
-            time.sleep(retry * 0.1)
-            continue
+        touch(address, n)
+
         retry = 0
         n = values.next()
-        log.debug("Next %d" % n)
         time.sleep(0.2)
 
     log.debug("Opening port %d" % ttp.get_destination())

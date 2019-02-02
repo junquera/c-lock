@@ -74,24 +74,29 @@ class TocTocPorts():
         values = []
 
         aux = val
+        print(aux)
         for i in range(self._n_ports):
 
             aux = totp.hotp(self._secret, aux)
-            print(aux)
 
-            min_port = (2 << 10) + 1
-            max_port = 2 << 13
+            # hotp generates 0 < x < 1e6
+            relative = aux/1e6
 
-            # Value between min_port and max_port, from 2^16 values
-            aux = int(min_port + (max_port - min_port) * float(aux) / (2 << 16))
+            min_port = 1024
+            max_port = 65535
 
-            if aux < 1024:
-                aux += 1024
+            # Value between min_port and max_port
+            aux = int(min_port + ((max_port - min_port) * float(aux) /1e6))
 
-            while aux in self._forbidden or aux in values or aux == self._destination:
-                aux += 1
+            # if aux < 1024:
+            #     aux += 1024
+            #
+            # while aux in self._forbidden or aux in values or aux == self._destination:
+            #     aux += 1
 
             values.append(aux)
+
+        print(values)
         return values
 
 

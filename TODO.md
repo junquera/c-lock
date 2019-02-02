@@ -1,5 +1,7 @@
 # TODO
 
+- [ ] Open port upnp
+
 - [ ] Ajustar a RFC-6238
 
 - [ ] Make it work with previous/next time slots for clock issues.
