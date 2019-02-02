@@ -26,7 +26,7 @@ def check_environment():
 
 
 # TODO Sacar a una clase y hacer el main con arg_parser
-def main_server(secret, slot, forbidden, address):
+def main_server(secret, slot, address, ports):
 
     try:
         check_environment()
@@ -47,14 +47,14 @@ def main_server(secret, slot, forbidden, address):
     fwm = FirewallManager()
     fwmq = Queue()
     b.add_client(fwmq)
-    fwmw = FirewallManagerWorker(fwmq, bq, open_ports=forbidden, fwm=fwm)
+    fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
 
     pmq = Queue()
     b.add_client(pmq)
     pm = PortManager(address)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
-    ttp = TocTocPorts(secret, forbidden=forbidden)
+    ttp = TocTocPorts(secret, destination=ports)
 
     ttpq = Queue()
     b.add_client(ttpq)
@@ -112,10 +112,9 @@ def main():
 
     parser = argparse.ArgumentParser(description='Launch TOTP based port knocking protection')
     parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
-    parser.add_argument('-f', '--forbidden', default=[], type=int, nargs='+', help="Ports already in use or not manageable (space separated)")
     parser.add_argument('-a', '--address', default='0.0.0.0', help="Address to protect")
     parser.add_argument('-s', '--secret', help="Secret part of TOTP")
-    parser.add_argument('-p', '--protected-port', type=int, help="Port which has to be protected")
+    parser.add_argument('-p', '--protected-ports', type=int, action='append', help="Port which has to be protected")
     parser.add_argument('--gen-secret', help="Generate random secret", action='store_true')
     parser.add_argument('--clean-firewall', help="Clean firewall configuration (e.g., after a bad close)", action='store_true')
     parser.add_argument('--log-level', default="DEBUG", help="Log level")
@@ -130,6 +129,8 @@ def main():
         level= level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
+
+    print(args)
 
     if args.gen_secret:
         secret = totp.gen_secret()
@@ -155,10 +156,11 @@ def main():
 
         secret = args.secret
         slot = args.slot
-        forbidden_ports = args.forbidden
-        address = args.address
 
-        main_server(secret, slot, forbidden_ports, address)
+        address = args.address
+        ports = args.protected_ports if args.protected_ports else [22]
+
+        main_server(secret, slot, address, ports)
 
 
 if __name__ == '__main__':

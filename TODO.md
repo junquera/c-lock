@@ -1,5 +1,9 @@
 # TODO
 
+- [ ] En TocTocPorts sólo queremos los puertos actuales
+
+- [ ] ¿Centralizar eventos?
+
 - [ ] Open port upnp
 
 - [ ] Ajustar a RFC-6238

@@ -128,7 +128,6 @@ class PortManager():
     def last_port(self, addr):
         log.info("%s reached last port" % (addr))
 
-
     def open(self, port_list):
         self._active = {}
         self._port_list = port_list
@@ -167,11 +166,12 @@ class PortManagerWorker(ProcWorker):
         self._pm = pm
 
         self._pm.notify_connection = bypass(self._pm.notify_connection, self.notify_connection)
+        self._pm.last_port = bypass(self._pm.last_port, self.last_port)
 
     def notify_connection(self, addr, port):
         self._o.put(Event(PortManagerEvent.NEW_CONNECTION, {'port': port, 'address': addr}))
 
-    def last_port(self, addr):
+    def last_port(self, address):
             self._o.put(Event(PortManagerEvent.LAST_PORT, dict(address=address)))
 
     def process_evt(self, evt):

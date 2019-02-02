@@ -96,25 +96,25 @@ class FirewallManager():
         # rule.target = iptc.Target(rule, "ACCEPT")
         # rule.src = "127.0.0.1"
         # chain.insert_rule(rule)
+    #
+    # def unmanage_port(self, port):
+    #
+    #     table = iptc.Table(iptc.Table.FILTER)
+    #
+    #     chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
+    #
+    #     rule = iptc.Rule() # *
+    #     rule.protocol = "tcp"
+    #     match = iptc.Match(rule, "tcp")
+    #     match.dport = "%d" % port
+    #     rule.add_match(match)
+    #
+    #     # TODO Debería ir a INPUT, pero puede hacer un bucle infinito
+    #     rule.target = iptc.Target(rule, "ACCEPT")
+    #
+    #     chain.insert_rule(rule)
 
-    def unmanage_port(self, port):
-
-        table = iptc.Table(iptc.Table.FILTER)
-
-        chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
-
-        rule = iptc.Rule() # *
-        rule.protocol = "tcp"
-        match = iptc.Match(rule, "tcp")
-        match.dport = "%d" % port
-        rule.add_match(match)
-
-        # TODO Debería ir a INPUT, pero puede hacer un bucle infinito
-        rule.target = iptc.Target(rule, "ACCEPT")
-
-        chain.insert_rule(rule)
-
-    def open_port(self, port, origin=None):
+    def open_port(self, port, s_address=None):
         # TODO Evitar insertar reglas repetidas
         table = iptc.Table(iptc.Table.FILTER)
 
@@ -122,8 +122,8 @@ class FirewallManager():
 
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
-        if origin:
-            rule.src = origin
+        if s_address:
+            rule.src = s_address
         # rule.dst = "0.0.0.0"
         match = iptc.Match(rule, "tcp")
         match.dport = "%d" % port
@@ -140,12 +140,12 @@ class FirewallManager():
 
         return rule
 
-    def gen_rule(self, port, origin=None):
+    def gen_rule(self, port, s_address=None):
 
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
-        if origin:
-            rule.src = origin
+        if s_address:
+            rule.src = s_address
         # rule.dst = "0.0.0.0"
         match = iptc.Match(rule, "tcp")
         match.dport = "%d" % port
@@ -154,15 +154,15 @@ class FirewallManager():
 
         return rule
 
-    def close_port(self, port, origin=None):
+    def close_port(self, port, s_address=None):
         table = iptc.Table(iptc.Table.FILTER)
 
         chain = iptc.Chain(table, "toc-toc-ssh")
 
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
-        if origin:
-            rule.src = origin
+        if s_address:
+            rule.src = s_address
         # rule.dst = "0.0.0.0"
         match = iptc.Match(rule, "tcp")
         match.dport = "%d" % port
@@ -333,10 +333,10 @@ class RuleManager(threading.Thread):
                 if hard or not rule_data['protected']:
                     self.delete_rule(rule_id)
 
+
 class FirewallManagerWorker(ProcWorker):
 
-
-    def __init__(self, i_q, o_q, open_ports=[], fwm=None):
+    def __init__(self, i_q, o_q, fwm=None):
 
         super(FirewallManagerWorker, self).__init__(i_q, o_q)
 
@@ -347,22 +347,18 @@ class FirewallManagerWorker(ProcWorker):
 
         # TODO Abrir puertos marcados como no gestionados (prohibidos)
         self._rule_manager = RuleManager(fwm)
-        for port in open_ports:
-            self.unmanage_port(port)
 
-    def unmanage_port(self, port):
-        self._fwm.unmanage_port(port)
-
-    def open_port(self, port, origin=None, caducity=-1, protected=False):
+    def open_port(self, port, s_address=None, caducity=-1, protected=False):
         # We protect this rule for allowing the user to connect on step change
-        r = self._fwm.gen_rule(port, origin=origin)
+        r = self._fwm.gen_rule(port, s_address=s_address)
         exist = self._rule_manager.exist_rule(r)
         if exist:
             self._rule_manager.renew_rule_timestamp(exist)
         else:
             try:
-                self._fwm.open_port(port, origin=origin)
+                self._fwm.open_port(port, s_address=s_address)
                 self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
+                log.debug("Opening port %d for %s" % (port, s_address))
             except Exception as e:
                 log.critical("Error opening port %d: %e" % (port, e))
 
@@ -374,28 +370,14 @@ class FirewallManagerWorker(ProcWorker):
             self._rule_manager.close()
             self._fwm.close()
 
-        if evt.get_id() == PortManagerEvent.NEW_CONNECTION:
-            evt_value = evt.get_value()
-            port = evt_value['next']
-            addr = evt_value['address']
-            log.info("Opening port %s for %s" % (port, addr))
-
-            self.open_port(port, origin=addr, caducity=2)
-
         if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()
-            port = evt_value['port']
+            ports = evt_value['ports']
             addr = evt_value['address']
-            log.info("Opening last port %s for %s" % (port, addr))
+            log.info("Opening ports %s for %s" % (ports, addr))
 
-            self.open_port(port, origin=addr, caducity=30, protected=True)
-
-        if evt.get_id() == PortManagerEvent.FIRST_PORT:
-            evt_value = evt.get_value()
-            port = evt_value['port']
-            log.info("Opening first port %s" % (port))
-
-            self.open_port(port)
+            for port in ports:
+                self.open_port(port, s_address=addr, caducity=30, protected=True)
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?

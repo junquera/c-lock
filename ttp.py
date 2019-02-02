@@ -43,19 +43,18 @@ class PortList():
 
 class TocTocPorts():
 
-    def __init__(self, secret, slot=30, n_ports=4, destination=22, forbidden=[]):
+    def __init__(self, secret, slot=30, n_ports=4, destination=[22]):
 
         self._secret = secret
         self._slot = slot
-        self._forbidden = forbidden
+
         self._destination = destination
 
         if n_ports < 1:
             raise Exception("Error, at least %d ports needed" % 1)
 
-        if n_ports > 6:
-            raise Exception("Error, max ports: %d" % 6)
-
+        if n_ports > 10:
+            raise Exception("Error, max ports: %d" % 10)
 
         self._n_ports = n_ports
 
@@ -110,7 +109,6 @@ class TocTocPorts():
         t = int(time.time())
         remainder = t % self._slot
         return self._slot - remainder
-
 
     def last(self):
         t = int(time.time())
@@ -195,4 +193,4 @@ class TocTocPortsWorker(ProcWorker):
         super(TocTocPortsWorker, self).process_evt(evt)
 
         if evt.get_id() == PortManagerEvent.LAST_PORT:
-            self._o.put(Event(TocTocPortsEvent.LAST_PORT, {'port': self._ttp.get_destination(), 'address': evt.get_value()['address']}))
+            self._o.put(Event(TocTocPortsEvent.LAST_PORT, {'ports': self._ttp.get_destination(), 'address': evt.get_value()['address']}))

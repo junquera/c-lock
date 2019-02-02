@@ -33,7 +33,7 @@ def toc_ports(ttp, address):
         n = values.next()
         time.sleep(0.2)
 
-    log.debug("Opening port %d" % ttp.get_destination())
+    log.debug("Knock finished")
 
 import argparse
 def main():
@@ -51,7 +51,7 @@ def main():
     log.debug("Secret: %s" % secret)
 
     ports = TocTocPorts(secret)
-    print(ports)
+
     toc_ports(ports, address)
 
 if __name__ == '__main__':
