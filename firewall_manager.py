@@ -22,36 +22,28 @@ class FirewallManager():
 
         # Crear chain
         try:
-            table.create_chain("toc-toc-ssh-unmanaged")
-        except Exception as e:
-            log.debug("toc-toc-ssh-unmanaged exists!")
-
-        # Crear chain
-        try:
             table.create_chain("toc-toc-ssh")
         except Exception as e:
             log.debug("toc-toc-ssh exists!")
 
-        # Crear última chain
-        try:
-            table.create_chain("toc-toc-ssh-reject")
-        except Exception as e:
-            log.debug("toc-toc-ssh-reject exists!")
 
         # TODO ¿Debería venir desde ACCEPT?
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
+        # TODO Añadir que mande aquí todos los puertos protegidos, o todas las conexiones si se protege todo
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
-        # Apuntar INPUT a toc-toc-ssh-unmanaged
-        rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
-        chain.insert_rule(rule,position=len(chain.rules))
-
-
-        # toc-toc-ssh-unmanaged config
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh-unmanaged")
-        rule = iptc.Rule() # *
-        rule.protocol = "tcp"
+        # Apuntar INPUT a toc-toc-ssh
         rule.target = iptc.Target(rule, "toc-toc-ssh")
+        chain.insert_rule(rule, position=len(chain.rules))
+
+
+        # toc-toc-ssh config
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
+
+        # Drop all the rest
+        rule = iptc.Rule()
+        rule.protocol = "tcp"
+        rule.target = iptc.Target(rule, "DROP")
         chain.insert_rule(rule)
 
         # Accept all established
@@ -63,29 +55,13 @@ class FirewallManager():
         rule.add_match(match)
         chain.insert_rule(rule)
 
-        # TODO Add option to block also this connections
+        # TODO Accept all OUTPUT
+
         # Accept all localhost connections
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
         rule.src = "127.0.0.1"
         rule.target = iptc.Target(rule, "ACCEPT")
-        chain.insert_rule(rule)
-
-        # toc-toc-ssh config
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
-        # Apuntar toc-toc-ssh a toc-toc-ssh-reject
-        rule = iptc.Rule() # *
-        rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "toc-toc-ssh-reject")
-        chain.insert_rule(rule)
-
-        # Last chain!
-        chain = iptc.Chain(table, "toc-toc-ssh-reject")
-
-        # Drop all
-        rule = iptc.Rule()
-        rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "REJECT")
         chain.insert_rule(rule)
 
 
@@ -114,7 +90,7 @@ class FirewallManager():
     #
     #     chain.insert_rule(rule)
 
-    def open_port(self, port, s_address=None):
+    def open(self, d_port=None, s_address=None):
         # TODO Evitar insertar reglas repetidas
         table = iptc.Table(iptc.Table.FILTER)
 
@@ -122,12 +98,16 @@ class FirewallManager():
 
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
+
         if s_address:
             rule.src = s_address
-        # rule.dst = "0.0.0.0"
-        match = iptc.Match(rule, "tcp")
-        match.dport = "%d" % port
-        rule.add_match(match)
+
+        if d_port:
+            print(d_port)
+            match = iptc.Match(rule, "tcp")
+            match.dport = "%d" % d_port
+            rule.add_match(match)
+
         rule.target = iptc.Target(rule, "ACCEPT")
 
         # TODO Puede servir para evitar repetidos
@@ -140,21 +120,8 @@ class FirewallManager():
 
         return rule
 
-    def gen_rule(self, port, s_address=None):
 
-        rule = iptc.Rule() # *
-        rule.protocol = "tcp"
-        if s_address:
-            rule.src = s_address
-        # rule.dst = "0.0.0.0"
-        match = iptc.Match(rule, "tcp")
-        match.dport = "%d" % port
-        rule.add_match(match)
-        rule.target = iptc.Target(rule, "ACCEPT")
-
-        return rule
-
-    def close_port(self, port, s_address=None):
+    def close(self, d_port=None, s_address=None):
         table = iptc.Table(iptc.Table.FILTER)
 
         chain = iptc.Chain(table, "toc-toc-ssh")
@@ -164,9 +131,11 @@ class FirewallManager():
         if s_address:
             rule.src = s_address
         # rule.dst = "0.0.0.0"
-        match = iptc.Match(rule, "tcp")
-        match.dport = "%d" % port
-        rule.add_match(match)
+        if d_port:
+            match = iptc.Match(rule, "tcp")
+            match.dport = "%d" % port
+            rule.add_match(match)
+
         rule.target = iptc.Target(rule, "REJECT")
         chain.insert_rule(rule)
 
@@ -186,23 +155,15 @@ class FirewallManager():
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         rule = iptc.Rule()
         rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "toc-toc-ssh-unmanaged")
+        rule.target = iptc.Target(rule, "toc-toc-ssh")
 
+        # TODO Ver como usar esto sin borrar otras reglas del firewall
         while rule in chain.rules:
             chain.delete_rule(rule)
-
-        chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
-        chain.flush()
-        chain.delete()
 
         chain = iptc.Chain(table, "toc-toc-ssh")
         chain.flush()
         chain.delete()
-
-        chain = iptc.Chain(table, "toc-toc-ssh-reject")
-        chain.flush()
-        chain.delete()
-
 
     def close(self):
         self.clean_firewall()
@@ -348,19 +309,19 @@ class FirewallManagerWorker(ProcWorker):
         # TODO Abrir puertos marcados como no gestionados (prohibidos)
         self._rule_manager = RuleManager(fwm)
 
-    def open_port(self, port, s_address=None, caducity=-1, protected=False):
+    def open(self, port=None, s_address=None, caducity=-1, protected=False):
         # We protect this rule for allowing the user to connect on step change
-        r = self._fwm.gen_rule(port, s_address=s_address)
+        r = self._fwm.open(port, s_address=s_address)
         exist = self._rule_manager.exist_rule(r)
         if exist:
             self._rule_manager.renew_rule_timestamp(exist)
         else:
             try:
-                self._fwm.open_port(port, s_address=s_address)
+                self._fwm.open(port, s_address=s_address)
                 self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
                 log.debug("Opening port %d for %s" % (port, s_address))
             except Exception as e:
-                log.critical("Error opening port %d: %e" % (port, e))
+                log.critical("Error opening port for %s %s" % (s_address, e))
 
     def process_evt(self, evt):
 
@@ -376,8 +337,12 @@ class FirewallManagerWorker(ProcWorker):
             addr = evt_value['address']
             log.info("Opening ports %s for %s" % (ports, addr))
 
-            for port in ports:
-                self.open_port(port, s_address=addr, caducity=30, protected=True)
+            # Usamos esto porque hemos determinado usar FT/SNIFF/O1
+            self.open(s_address=addr, caducity=30, protected=True)
+
+            # TODO Implementar esto si determinamos usar FT/SNIFF/O2
+            # for port in ports:
+            #     self.open(port, s_address=addr, caducity=30, protected=True)
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?
