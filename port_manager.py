@@ -23,6 +23,7 @@ class KnockablePort():
     def get_socket(self):
         return self._socket
 
+from scapy.all import sniff, IP, TCP
 
 class PortManager():
 
@@ -32,7 +33,6 @@ class PortManager():
         self._address = address
 
         try:
-            self._s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
 
             evt = threading.Event()
             t = threading.Thread(target=self.wait_and_listen, args=(evt,))
@@ -48,65 +48,13 @@ class PortManager():
         log.info("wait_and_listen")
         errors = 0
         # TODO Ver por qué no termina el hilo...
-        while not evt.is_set():
-            try:
-                packet = self._s.recvfrom(65565)
-
-                #packet string from tuple
-                packet = packet[0]
-
-                #take first 20 characters for the ip header
-                ip_header = packet[0:20]
-                # print(ip_header)
-
-                #now unpack them :)
-                iph = unpack('!BBHHHBBH4s4s' , ip_header)
-
-                version_ihl = iph[0]
-                version = version_ihl >> 4
-                ihl = version_ihl & 0xF
-
-                iph_length = ihl * 4
-
-                ttl = iph[5]
-                protocol = iph[6]
-                s_addr = socket.inet_ntoa(iph[8])
-                d_addr = socket.inet_ntoa(iph[9])
-
-                # print 'Version : ' + str(version) + ' IP Header Length : ' + str(ihl) + ' TTL : ' + str(ttl) + ' Protocol : ' + str(protocol) + ' Source Address : ' + str(s_addr) + ' Destination Address : ' + str(d_addr)
-
-                tcp_header = packet[iph_length:iph_length+20]
-
-                #now unpack them :)
-                tcph = unpack('!HHLLBBHHH' , tcp_header)
-
-                source_port = tcph[0]
-                dest_port = tcph[1]
-                sequence = tcph[2]
-                acknowledgement = tcph[3]
-                doff_reserved = tcph[4]
-
-                flags = tcph[5]
-
-                syn = flags & 0b10
-                ack = flags & 0b10000
-                fin = flags & 0b1
-
-                # TODO If is start connection
-                if syn and not ack:
-                    self.notify_connection(s_addr, dest_port)
-
-            except Exception as e:
-                if not evt.is_set():
-                    log.error("Error on socket: %s" % str(e))
-                    errors += 1
-                    if errors >= 3:
-                        log.critical("Error on socket: %s" % str(e))
-                        break
+        myfilter = '(tcp[13]&2!=0 and tcp[13]&16==0)'
+        sniff(prn=lambda pkt: self.notify_connection(pkt[IP].dst, pkt[TCP].dport), stop_filter=lambda x: evt.is_set() filter=myfilter, store=0)
 
         log.info("nor_wait_nor_listen")
 
     def notify_connection(self, addr, port):
+        print(addr, port)
         # TODO Hacer esto con métodos con bloqueos (@lock)
         if addr in self._active:
             addr_info = self._active[addr]
@@ -148,10 +96,6 @@ class PortManager():
 
     def close(self):
         self.unlock_threads()
-        # Knock a port for stopping the socket thread
-        touch(self._address, 12345)
-        self._s.close()
-
 
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Event_Objects_between_Threads.php

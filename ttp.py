@@ -169,6 +169,7 @@ class TocTocPorts():
         res += " [*] NEXT_SLOT: %ds\n" % self.next()
         return res
 
+
 class TocTocPortsWorker(ProcWorker):
 
     def __init__(self, i_q, o_q, ttp):
