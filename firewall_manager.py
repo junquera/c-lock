@@ -338,11 +338,13 @@ class FirewallManagerWorker(ProcWorker):
             log.info("Opening ports %s for %s" % (ports, addr))
 
             # Usamos esto porque hemos determinado usar FT/SNIFF/O1
-            self.open(s_address=addr, caducity=30, protected=True)
+            if len(ports):
+                for port in ports:
+                    self.open(port, s_address=addr, caducity=30, protected=True)
+            else:
+                # TODO Implementar esto si determinamos usar FT/SNIFF/O2
+                self.open(s_address=addr, caducity=30, protected=True)
 
-            # TODO Implementar esto si determinamos usar FT/SNIFF/O2
-            # for port in ports:
-            #     self.open(port, s_address=addr, caducity=30, protected=True)
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?

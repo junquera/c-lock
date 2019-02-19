@@ -43,7 +43,7 @@ class PortList():
 
 class TocTocPorts():
 
-    def __init__(self, secret, slot=30, n_ports=4, destination=[22]):
+    def __init__(self, secret, slot=30, n_ports=4, destination=[]):
 
         self._secret = secret
         self._slot = slot

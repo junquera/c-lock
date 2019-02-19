@@ -10,19 +10,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-
-class KnockablePort():
-
-    def __init__(self, socket, next_port):
-        self._socket = socket
-        self._next_port = next_port
-
-    def get_next_port(self):
-        return self._next_port
-
-    def get_socket(self):
-        return self._socket
-
 from scapy.all import sniff, IP, TCP
 
 class PortManager():
@@ -49,7 +36,7 @@ class PortManager():
         errors = 0
         # TODO Ver por qué no termina el hilo...
         myfilter = '(tcp[13]&2!=0 and tcp[13]&16==0)'
-        sniff(prn=lambda pkt: self.notify_connection(pkt[IP].dst, pkt[TCP].dport), stop_filter=lambda x: evt.is_set() filter=myfilter, store=0)
+        sniff(prn=lambda pkt: self.notify_connection(pkt[IP].dst, pkt[TCP].dport), stop_filter=lambda x: evt.is_set(), filter=myfilter, store=0)
 
         log.info("nor_wait_nor_listen")
 
