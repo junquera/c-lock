@@ -317,9 +317,12 @@ class FirewallManagerWorker(ProcWorker):
         self._rule_manager = RuleManager(fwm)
 
     def open(self, port=None, s_address=None, caducity=-1, protected=False):
+
         # We protect this rule for allowing the user to connect on step change
         r = self._fwm.gen_rule(port, s_address=s_address)
+
         exist = self._rule_manager.exist_rule(r)
+
         if exist:
             self._rule_manager.renew_rule_timestamp(exist)
         else:

@@ -63,6 +63,7 @@ class PortManager():
     def last_port(self, addr):
         log.info("%s reached last port" % (addr))
 
+    # TODO Rename to reset
     def open(self, port_list):
         self._active = {}
         self._port_list = port_list
