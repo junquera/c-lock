@@ -1,7 +1,6 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/alerts/
 )
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/context:python)
-[![Build Status](https://travis-ci.org/junquera/stalker.svg?branch=master)](https://travis-ci.org/junquera/stalker)
 
 # toc-toc-ssh
 
