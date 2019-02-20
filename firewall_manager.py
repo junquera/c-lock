@@ -90,11 +90,9 @@ class FirewallManager():
     #
     #     chain.insert_rule(rule)
 
-    def open(self, d_port=None, s_address=None):
-        # TODO Evitar insertar reglas repetidas
-        table = iptc.Table(iptc.Table.FILTER)
 
-        chain = iptc.Chain(table, "toc-toc-ssh")
+    # if !open then close
+    def gen_rule(self, d_port=None, s_address=None, open=True):
 
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
@@ -108,7 +106,7 @@ class FirewallManager():
             match.dport = "%d" % d_port
             rule.add_match(match)
 
-        rule.target = iptc.Target(rule, "ACCEPT")
+        rule.target = iptc.Target(rule, "ACCEPT" if open else "REJECT")
 
         # TODO Puede servir para evitar repetidos
         # try:
@@ -116,30 +114,39 @@ class FirewallManager():
         # except Exception as e:
         #     pass
 
+        return rule
+
+    def open(self, d_port=None, s_address=None):
+        # TODO Evitar insertar reglas repetidas
+        table = iptc.Table(iptc.Table.FILTER)
+
+        chain = iptc.Chain(table, "toc-toc-ssh")
+
+        rule = self.gen_rule(d_port, s_address, open=True)
+
         chain.insert_rule(rule)
 
         return rule
-
 
     def close(self, d_port=None, s_address=None):
         table = iptc.Table(iptc.Table.FILTER)
 
         chain = iptc.Chain(table, "toc-toc-ssh")
 
-        rule = iptc.Rule() # *
-        rule.protocol = "tcp"
-        if s_address:
-            rule.src = s_address
-        # rule.dst = "0.0.0.0"
-        if d_port:
-            match = iptc.Match(rule, "tcp")
-            match.dport = "%d" % port
-            rule.add_match(match)
+        rule = self.gen_rule(d_port, s_address, open=False)
 
-        rule.target = iptc.Target(rule, "REJECT")
         chain.insert_rule(rule)
 
         return rule
+
+    def add_rule(self, rule):
+
+        table = iptc.Table(iptc.Table.FILTER)
+
+        chain = iptc.Chain(table, "toc-toc-ssh")
+        chain.insert_rule(rule)
+
+
 
     def delete_rule(self, rule):
         table = iptc.Table(iptc.Table.FILTER)
@@ -311,13 +318,13 @@ class FirewallManagerWorker(ProcWorker):
 
     def open(self, port=None, s_address=None, caducity=-1, protected=False):
         # We protect this rule for allowing the user to connect on step change
-        r = self._fwm.open(port, s_address=s_address)
+        r = self._fwm.gen_rule(port, s_address=s_address)
         exist = self._rule_manager.exist_rule(r)
         if exist:
             self._rule_manager.renew_rule_timestamp(exist)
         else:
             try:
-                self._fwm.open(port, s_address=s_address)
+                self._fwm.add_rule(r)
                 self._rule_manager.add_rule(r, caducity=caducity, protected=protected)
                 log.debug("Opening port %d for %s" % (port, s_address))
             except Exception as e:
