@@ -75,7 +75,7 @@ class TocTocPorts():
         aux = val
         print(aux)
         for i in range(self._n_ports):
-
+            # TODO Change self._secret to allow pin generation
             aux = totp.hotp(self._secret, aux)
 
             # hotp generates 0 < x < 1e6

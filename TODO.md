@@ -10,6 +10,8 @@
 
 - [ ] Añadir compatibilidad con tokens de Google Authenticator
 
+  - [ ] Not use secret to allow pin generation in ttp.gen_ports
+
 - [ ] Make it work with previous/next time slots for clock issues.
 
 - [ ] Al capturar error fatal, limpiar las reglas y dejar abierto el puerto de destino

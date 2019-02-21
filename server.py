@@ -131,11 +131,7 @@ def main():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
-    if args.gen_secret:
-        secret = totp.gen_secret()
-        print("TOTP Secret: %s" % secret)
-
-    elif args.clean_firewall:
+    if args.clean_firewall:
 
         try:
             check_environment()
@@ -148,12 +144,16 @@ def main():
         FirewallManager().clean_firewall()
     else:
 
-        if not args.secret:
+        if args.gen_secret:
+            secret = totp.gen_secret()
+            print("TOTP generated secret: %s" % secret)
+        elif not args.secret:
             log.error("A secret is required to start")
             parser.print_help()
             return
 
         secret = args.secret
+
         slot = args.slot
 
         address = args.address
