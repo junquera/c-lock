@@ -8,6 +8,8 @@
 
 - [ ] Ajustar a RFC-6238
 
+- [ ] Añadir compatibilidad con tokens de Google Authenticator
+
 - [ ] Make it work with previous/next time slots for clock issues.
 
 - [ ] Al capturar error fatal, limpiar las reglas y dejar abierto el puerto de destino
