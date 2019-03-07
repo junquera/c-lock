@@ -1,4 +1,4 @@
-from ttp import TocTocPorts
+from ttp import TocTocPorts, gen_ports_from_pin
 import socket
 import time
 
@@ -41,16 +41,28 @@ def main():
     parser = argparse.ArgumentParser(description='Launch TOTP based port knocking protection')
     parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
     parser.add_argument('-a', '--address', help="Address to knock", required=True)
-    parser.add_argument('-s', '--secret', help="Secret part of TOTP", required=True)
+    parser.add_argument('-s', '--secret', help="Secret part of TOTP")
+    parser.add_argument('-p', '--pin', help="TOTP pin", type=int)
     args = parser.parse_args()
 
-    secret = args.secret
     address = args.address
 
     log.debug("Address: %s" % address)
-    log.debug("Secret: %s" % secret)
 
-    ports = TocTocPorts(secret)
+    print("jaja")
+    if args.secret:
+        if args.pin:
+            raise Exception("Error secret or pin, never both (scecret ^ pin)")
+        secret = args.secret
+        ports = TocTocPorts(secret)
+        log.debug("Secret: %s" % secret)
+    elif:
+        pin = args.pin
+        ports = gen_ports_from_pin(pin)
+        log.debug("Pin: %d" % pin)
+    else:
+        raise Exception("Set secret or pin")
+
 
     toc_ports(ports, address)
 

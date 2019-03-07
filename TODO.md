@@ -10,7 +10,13 @@
 
 - [ ] Añadir compatibilidad con tokens de Google Authenticator
 
-  - [ ] Not use secret to allow pin generation in ttp.gen_ports
+  - [x] Not use secret to allow pin generation in ttp.gen_ports
+
+  - [ ] Ver tamaño de clave de Authenticator para generarla igual
+
+  - [ ] Tratar de generar bidi por consola
+
+  Cambiado hotp después de recibir valor `totp` por random con semilla
 
 - [ ] Make it work with previous/next time slots for clock issues.
 

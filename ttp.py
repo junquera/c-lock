@@ -3,9 +3,32 @@ import totp
 import time
 import threading
 import logging
+import random
 
 log = logging.getLogger(__name__)
 
+
+# 0 <= val < 1000000 --> 6 digits (24 bytes)
+# 1024 < port < 10240
+# 3 <= n_ports <= 6
+def gen_ports_from_pin(pin, n_ports):
+
+    values = []
+
+    aux = pin
+
+
+    min_port = 2**10 # 1024
+    max_port = 2**16 # 65536
+
+    for i in range(n_ports):
+        random.seed(aux)
+
+        aux = random.randint(min_port, max_port)
+
+        values.append(aux)
+
+    return values
 
 class PortList():
 
@@ -65,40 +88,6 @@ class TocTocPorts():
         self._n = ports['n']
         # time.sleep(ns)
 
-    # 0 <= val < 1000000 --> 6 digits (24 bytes)
-    # 1024 < port < 10240
-    # 3 <= n_ports <= 6
-    def gen_ports(self, val):
-
-        values = []
-
-        aux = val
-        print(aux)
-        for i in range(self._n_ports):
-            # TODO Change self._secret to allow pin generation
-            aux = totp.hotp(self._secret, aux)
-
-            # hotp generates 0 < x < 1e6
-            relative = aux/1e6
-
-            min_port = 1024
-            max_port = 65535
-
-            # Value between min_port and max_port
-            aux = int(min_port + ((max_port - min_port) * float(aux) /1e6))
-
-            # if aux < 1024:
-            #     aux += 1024
-            #
-            # while aux in self._forbidden or aux in values or aux == self._destination:
-            #     aux += 1
-
-            values.append(aux)
-
-        print(values)
-        return values
-
-
     def get_slot(self):
         return self._slot
 
@@ -124,7 +113,7 @@ class TocTocPorts():
         tcp = self.last() - self._slot
         valp = totp.totp(self._secret, tcp)
 
-        portsp = self.gen_ports(valp)
+        portsp = gen_ports_from_pin(valp, self._n_ports)
 
         return PortList(portsp)
 
@@ -132,7 +121,7 @@ class TocTocPorts():
 
         tca = self.last()
         vala = totp.totp(self._secret, tca)
-        portsa = self.gen_ports(vala)
+        portsa = gen_ports_from_pin(vala, self._n_ports)
 
         return PortList(portsa)
 
@@ -140,7 +129,7 @@ class TocTocPorts():
 
         tcn = self.last() + self._slot
         valn = totp.totp(self._secret, tcn)
-        portsn = self.gen_ports(valn)
+        portsn = gen_ports_from_pin(valn, self._n_ports)
 
         return PortList(portsn)
 
