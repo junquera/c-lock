@@ -26,7 +26,7 @@ def check_environment():
 
 
 # TODO Sacar a una clase y hacer el main con arg_parser
-def main_server(secret, slot, address, ports):
+def main_server(secret, slot, address, ports, opened):
 
     try:
         check_environment()
@@ -48,6 +48,9 @@ def main_server(secret, slot, address, ports):
     fwmq = Queue()
     b.add_client(fwmq)
     fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
+
+    for port in opened:
+        fwm.open(port)
 
     pmq = Queue()
     b.add_client(pmq)
@@ -114,8 +117,8 @@ def main():
     parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
     parser.add_argument('-a', '--address', default='0.0.0.0', help="Address to protect")
     parser.add_argument('-s', '--secret', help="Secret part of TOTP")
-    parser.add_argument('-p', '--protected-ports', type=int, action='append', help="Port which has to be protected")
-    parser.add_argument('-o', '--opened-ports', type=int, action='append', help="Port which should be opened")
+    parser.add_argument('-p', '--protected-ports', type=int, default=[], action='append', help="Port which has to be protected")
+    parser.add_argument('-o', '--opened-ports', type=int, default=[], action='append', help="Port which should be opened")
     parser.add_argument('--gen-secret', help="Generate random secret", action='store_true')
     parser.add_argument('--clean-firewall', help="Clean firewall configuration (e.g., after a bad close)", action='store_true')
     parser.add_argument('--log-level', default="DEBUG", help="Log level")
@@ -159,9 +162,9 @@ def main():
         address = args.address
         ports = args.protected_ports if args.protected_ports else []
 
-        # TODO opened = args.opened_ports
+        opened = args.opened_ports
 
-        main_server(secret, slot, address, ports)
+        main_server(secret, slot, address, ports, opened)
 
 
 if __name__ == '__main__':
