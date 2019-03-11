@@ -20,17 +20,12 @@ def touch(address, port):
     except Exception as e:
         pass
 
-def toc_ports(ttp, address):
+def toc_ports(values, address):
 
-    values = ttp.get_actual()
+    for value in values:
 
-    retry = 0
-    n = values.next()
-    while n:
-        touch(address, n)
+        touch(address, value)
 
-        retry = 0
-        n = values.next()
         time.sleep(0.2)
 
     log.debug("Knock finished")
@@ -42,23 +37,26 @@ def main():
     parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
     parser.add_argument('-a', '--address', help="Address to knock", required=True)
     parser.add_argument('-s', '--secret', help="Secret part of TOTP")
-    parser.add_argument('-p', '--pin', help="TOTP pin", type=int)
+    parser.add_argument('-p', '--pin', type=int, help="TOTP pin")
+    parser.add_argument('-n', '--ports', type=int, help="Number of ports configured", default=4)
     args = parser.parse_args()
 
     address = args.address
 
     log.debug("Address: %s" % address)
+    n_ports = args.ports
 
-    print("jaja")
     if args.secret:
+
         if args.pin:
             raise Exception("Error secret or pin, never both (scecret ^ pin)")
+
         secret = args.secret
-        ports = TocTocPorts(secret)
+        ports = TocTocPorts(secret).get_actual().get_values()
         log.debug("Secret: %s" % secret)
-    elif:
+    elif args.pin:
         pin = args.pin
-        ports = gen_ports_from_pin(pin)
+        ports = gen_ports_from_pin(pin, n_ports)
         log.debug("Pin: %d" % pin)
     else:
         raise Exception("Set secret or pin")

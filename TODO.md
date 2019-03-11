@@ -6,7 +6,9 @@
 
 - [ ] Open port upnp
 
-- [ ] Ajustar a RFC-6238
+- [x] Ajustar a RFC-6238
+
+- [ ] Colas para poder comunicarse con comandos (por ejemplo, para dejar abierto un puerto)
 
 - [ ] Añadir compatibilidad con tokens de Google Authenticator
 
@@ -15,6 +17,8 @@
   - [ ] Ver tamaño de clave de Authenticator para generarla igual
 
   - [ ] Tratar de generar bidi por consola
+
+  - [x] Toc by pin
 
   Cambiado hotp después de recibir valor `totp` por random con semilla
 
