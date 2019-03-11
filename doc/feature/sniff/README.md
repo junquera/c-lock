@@ -18,10 +18,8 @@ Tengo que tirar de scapy en lugar del sniffer *artesanal* porque con el firewall
 
 - [x] Set behaviour for multiple protected ports (in ttp)
 
-- [ ] Cambiar reglas del firewall
+- [x] Cambiar reglas del firewall
 
-  - [ ] Hacer que al arrancar, cierre los puertos a proteger en su propia chain
-
-  - [ ] Hacer que al arrancar, abra los puertos especificados como abiertos
+  - [x] Hacer que al arrancar, abra los puertos especificados como abiertos
 
 - [ ] Test
