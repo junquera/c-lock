@@ -8,7 +8,7 @@
 
 - [x] Ajustar a RFC-6238
 
-- [ ] Colas para poder comunicarse con comandos (por ejemplo, para dejar abierto un puerto)
+- [ ] Colas para poder comunicarse con comandos (por ejemplo, para dejar abierto un puerto) (`feature/queue`, refered in `feature/snif`)
 
 - [ ] Añadir compatibilidad con tokens de Google Authenticator
 
