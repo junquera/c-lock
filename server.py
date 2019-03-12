@@ -44,9 +44,9 @@ def main_server(secret, slot, address, ports, opened):
 
     b = Broker(bq, oq)
 
-    fwm = FirewallManager()
     fwmq = Queue()
     b.add_client(fwmq)
+    fwm = FirewallManager()
     fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
 
     for port in opened:
@@ -54,13 +54,12 @@ def main_server(secret, slot, address, ports, opened):
 
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManager(address)
+    pm = PortManager(address, protected_ports=opened)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
-
-    ttp = TocTocPorts(secret, destination=ports)
 
     ttpq = Queue()
     b.add_client(ttpq)
+    ttp = TocTocPorts(secret, destination=ports)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
     fwmw.start()

@@ -10,6 +10,8 @@
 
 - [ ] Colas para poder comunicarse con comandos (por ejemplo, para dejar abierto un puerto) (`feature/queue`, refered in `feature/snif`)
 
+  - [ ] Que todo guarde relación con los eventos de ProcWorker
+
 - [ ] Añadir compatibilidad con tokens de Google Authenticator
 
   - [x] Not use secret to allow pin generation in ttp.gen_ports
