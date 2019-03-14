@@ -14,18 +14,6 @@ ipad = bytes((x ^ 0x36) for x in range(2**8))
 def bytes2int(b):
     return int.from_bytes(b, byteorder='big', signed=False)
 
-def encode(x):
-    if type(x) == bytes:
-        return x
-    else:
-        return codecs.encode(x)
-
-def decode(x):
-    if type(x) == bytes:
-        return codecs.decode(x)
-    else:
-        return x
-
 def xor(a, b):
 
     c = b''
@@ -46,17 +34,16 @@ def hmac(K, m):
     else:
         k = K
 
-    # encode(k) because Key must always be bytes
-    k = encode(k).ljust(block_size, b'\0')
+    k = k.ljust(block_size, '\0')
 
     o_key_pad = k.translate(opad) # xor(k, k.translate(opad))
     i_key_pad = k.translate(ipad) # xor(k, k.translate(ipad))
 
-    inner = hash_alg(encode(i_key_pad))
-    outer = hash_alg(encode(o_key_pad))
+    inner = hash_alg(codecs.encode(i_key_pad))
+    outer = hash_alg(codecs.encode(o_key_pad))
 
-    inner.update(encode(m))
-    outer.update(encode(inner.digest()))
+    inner.update(m)
+    outer.update(inner.digest())
 
     return outer.digest()
 
@@ -83,7 +70,7 @@ def hotp(K, I):
     return int(res)
 
 # TC = Time in seconds
-def totp(K, TC=int(time.time()), n=6):
+def totp(K, TC, n=6):
 
     t = int(TC/30)
     res = otp(K, t) % (10**n)
@@ -118,21 +105,3 @@ def web_secret_2_bytes(s):
     key = base64.b32decode(norm)
 
     return key
-
-
-if __name__ == '__main__':
-
-    K = 0x3132333435363738393031323334353637383930
-    S = codecs.decode(codecs.decode("%x" % K, "hex"))
-
-    print("secret: ", S)
-
-    # OTP TEST
-    print("otp: ", otp(S, 0))
-
-    # HOTP TEST
-    print("hotp: ", hotp(S, 0))
-
-    # TOTP TEST
-    t = 59
-    print("totp: ", totp(S, t))
