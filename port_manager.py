@@ -14,10 +14,12 @@ from scapy.all import sniff, IP, TCP
 
 class PortManager():
 
-    def __init__(self, address='0.0.0.0'):
+    def __init__(self, address='0.0.0.0', protected_ports=[]):
+
         self._sockets = []
         self._threads = []
         self._address = address
+        self._protected_ports = protected_ports
 
         try:
 
@@ -55,7 +57,8 @@ class PortManager():
                     addr_info['next'] = self._port_list[next_n]
                     self._active[addr] = addr_info
             else:
-                del self._active[addr]
+                if not port in self._protected_ports:
+                    del self._active[addr]
         else:
             if self._port_list[0] == port:
                 self._active[addr] = dict(next=self._port_list[1], n=1)
@@ -115,3 +118,6 @@ class PortManagerWorker(ProcWorker):
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             port_list = evt.get_value()['port_list'].get_values()
             self._pm.open(port_list)
+
+        if evt.get_id() == PortManagerEvent.PROTECT_PORT:
+            pass

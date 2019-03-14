@@ -146,8 +146,6 @@ class FirewallManager():
         chain = iptc.Chain(table, "toc-toc-ssh")
         chain.insert_rule(rule)
 
-
-
     def delete_rule(self, rule):
         table = iptc.Table(iptc.Table.FILTER)
 
