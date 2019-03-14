@@ -1,4 +1,5 @@
 from ttp import TocTocPorts, gen_ports_from_pin
+import totp
 import socket
 import time
 
@@ -51,7 +52,12 @@ def main():
         if args.pin:
             raise Exception("Error secret or pin, never both (scecret ^ pin)")
 
-        secret = args.secret
+        try:
+            secret = totp.web_secret_2_bytes(args.secret)
+        except Exception as e:
+            log.error("Bad secret: Remember secret = b32(secret_bytes)")
+            return
+
         ports = TocTocPorts(secret).get_actual().get_values()
         log.debug("Secret: %s" % secret)
     elif args.pin:

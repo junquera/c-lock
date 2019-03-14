@@ -90,7 +90,6 @@ def main_server(secret, slot, address, ports, opened):
         if fwmw.is_alive() or pmw.is_alive() or ttpw.is_alive() or b.is_alive():
             exit(0)
 
-
     signal.signal(signal.SIGINT, end)
     signal.signal(signal.SIGSEGV, end)
     signal.signal(signal.SIGFPE, end)
@@ -154,8 +153,14 @@ def main():
             log.error("A secret is required to start")
             parser.print_help()
             return
+        else:
+            secret = args.secret
 
-        secret = args.secret
+        try:
+            secret = totp.web_secret_2_bytes(secret)
+        except Exception as e:
+            log.error("Bad secret: Remember secret = b32(secret_bytes)")
+            return
 
         slot = args.slot
 

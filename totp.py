@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # from hashlib import sha256 as hash_alg
 from hashlib import sha1 as hash_alg
-import uuid
 import codecs
 import time
-
+import secrets
 import base64
 
 block_size = hash_alg().block_size
@@ -64,14 +63,10 @@ def hmac(K, m):
 
 def otp(secret, moving_factor):
 
-    # Bytes of hexadecimal string
-    s = str2hexs(secret)
-    s = codecs.decode(s, 'hex')
-
     c = "%016x" % moving_factor
     c = codecs.decode(c, 'hex')
 
-    r = hmac(s, c)
+    r = hmac(secret, c)
 
     offset = r[-1] & 0xf
     code = (r[offset] & 0x7f) << 24
@@ -104,8 +99,8 @@ def int_2_str(i):
     return "%c%c%c%c" % (a, b, c, d)
 
 def gen_secret():
-    return "%s%s" % (hash_alg(uuid.uuid4().bytes).hexdigest(), hash_alg(uuid.uuid4().bytes).hexdigest())
-
+    # TODO Better randomness?
+    return codecs.decode(base64.b32encode(secrets.token_bytes(32))).replace('=', '')
 
 def bytes2hexs(b):
     return codecs.encode(b, "hex")
@@ -116,12 +111,13 @@ def str2hexs(s):
     return res
 
 # Método para utilizar secretos 2fa de webs
-def from_web_secret(s):
+def web_secret_2_bytes(s):
 
     norm = s.replace(' ', '')
+    norm += '=' * (len(norm) % 8)
     key = base64.b32decode(norm)
 
-    return codecs.decode(key)
+    return key
 
 
 if __name__ == '__main__':
