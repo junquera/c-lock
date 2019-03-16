@@ -1,14 +1,16 @@
-import totp
-from proc_worker import Event, Broker, ProcWorkerEvent
-from ttp import *
+import tts.totp as totp
+from tts.proc_worker import Event, Broker, ProcWorkerEvent
+from tts.ttp import TocTocPorts, TocTocPortsWorker
 from queue import Queue
 import time
 import os
 import logging
 
 import signal
+import argparse
 
 log = logging.getLogger(__name__)
+
 
 def check_environment():
 
@@ -17,7 +19,7 @@ def check_environment():
 
     try:
         import iptc
-    except Exception as e:
+    except Exception as _:
 
         if 'XTABLES_LIBDIR' not in os.environ:
             os.environ['XTABLES_LIBDIR'] = '/usr/lib/x86_64-linux-gnu/xtables'
@@ -26,7 +28,7 @@ def check_environment():
 
 
 # TODO Sacar a una clase y hacer el main con arg_parser
-def main_server(secret, slot, forbidden, address):
+def main_server(secret, slot, address, ports, opened):
 
     try:
         check_environment()
@@ -36,28 +38,30 @@ def main_server(secret, slot, forbidden, address):
 
     log.debug("Secret: %s" % secret)
 
-    from port_manager import PortManagerWorker, PortManager
-    from firewall_manager import FirewallManager, FirewallManagerWorker
+    from tts.port_manager import PortManagerWorker, PortManager
+    from tts.firewall_manager import FirewallManager, FirewallManagerWorker
 
     oq = Queue()
     bq = Queue()
 
     b = Broker(bq, oq)
 
-    fwm = FirewallManager()
     fwmq = Queue()
     b.add_client(fwmq)
-    fwmw = FirewallManagerWorker(fwmq, bq, open_ports=forbidden, fwm=fwm)
+    fwm = FirewallManager()
+    fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
+
+    for port in opened:
+        fwm.open(port)
 
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManager(address)
+    pm = PortManager(address, unmanaged_ports=opened)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
-
-    ttp = TocTocPorts(secret, forbidden=forbidden)
 
     ttpq = Queue()
     b.add_client(ttpq)
+    ttp = TocTocPorts(secret, destination=ports)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
     fwmw.start()
@@ -87,7 +91,6 @@ def main_server(secret, slot, forbidden, address):
         if fwmw.is_alive() or pmw.is_alive() or ttpw.is_alive() or b.is_alive():
             exit(0)
 
-
     signal.signal(signal.SIGINT, end)
     signal.signal(signal.SIGSEGV, end)
     signal.signal(signal.SIGFPE, end)
@@ -96,10 +99,8 @@ def main_server(secret, slot, forbidden, address):
     signal.signal(signal.SIGILL, end)
     # TODO Clase orquestador
 
-import argparse
 
 def main():
-
 
     log_levels = {
         'DEBUG': logging.DEBUG,
@@ -112,10 +113,10 @@ def main():
 
     parser = argparse.ArgumentParser(description='Launch TOTP based port knocking protection')
     parser.add_argument('-ts', '--time-slot', dest='slot', default=30, type=int, help='Time slot for TOTP')
-    parser.add_argument('-f', '--forbidden', default=[], type=int, nargs='+', help="Ports already in use or not manageable (space separated)")
     parser.add_argument('-a', '--address', default='0.0.0.0', help="Address to protect")
     parser.add_argument('-s', '--secret', help="Secret part of TOTP")
-    parser.add_argument('-p', '--protected-port', type=int, help="Port which has to be protected")
+    parser.add_argument('-p', '--protected-ports', type=int, default=[], action='append', help="Port which has to be protected")
+    parser.add_argument('-o', '--opened-ports', type=int, default=[], action='append', help="Port which should be opened")
     parser.add_argument('--gen-secret', help="Generate random secret", action='store_true')
     parser.add_argument('--clean-firewall', help="Clean firewall configuration (e.g., after a bad close)", action='store_true')
     parser.add_argument('--log-level', default="DEBUG", help="Log level")
@@ -126,16 +127,13 @@ def main():
     log_level = args.log_level
 
     level = log_levels.get(log_level, logging.DEBUG)
+
     logging.basicConfig(
-        level= level,
+        level=level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
-    if args.gen_secret:
-        secret = totp.gen_secret()
-        print("TOTP Secret: %s" % secret)
-
-    elif args.clean_firewall:
+    if args.clean_firewall:
 
         try:
             check_environment()
@@ -143,22 +141,35 @@ def main():
             log.error(e)
             exit(-1)
 
-        from firewall_manager import FirewallManager
+        from tts.firewall_manager import FirewallManager
 
         FirewallManager().clean_firewall()
     else:
 
-        if not args.secret:
+        if args.gen_secret:
+            i_secret = totp.gen_secret()
+            print("TOTP generated secret: %s" % i_secret)
+        elif not args.secret:
             log.error("A secret is required to start")
             parser.print_help()
             return
+        else:
+            i_secret = args.secret
 
-        secret = args.secret
+        try:
+            secret = totp.web_secret_2_bytes(i_secret)
+        except Exception as e:
+            log.error("Bad secret: Remember secret = b32(secret_bytes)")
+            return
+
         slot = args.slot
-        forbidden_ports = args.forbidden
-        address = args.address
 
-        main_server(secret, slot, forbidden_ports, address)
+        address = args.address
+        ports = args.protected_ports if args.protected_ports else []
+
+        opened = args.opened_ports
+
+        main_server(secret, slot, address, ports, opened)
 
 
 if __name__ == '__main__':

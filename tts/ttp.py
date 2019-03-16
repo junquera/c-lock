@@ -1,11 +1,34 @@
-from proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
-import totp
+from .proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
+from . import totp
 import time
 import threading
 import logging
+import random
 
 log = logging.getLogger(__name__)
 
+
+# 0 <= val < 1000000 --> 6 digits (24 bytes)
+# 1024 < port < 10240
+# 3 <= n_ports <= 6
+def gen_ports_from_pin(pin, n_ports):
+
+    values = []
+
+    aux = pin
+
+
+    min_port = 2**10 # 1024
+    max_port = 2**16 # 65536
+
+    for i in range(n_ports):
+        random.seed(aux)
+
+        aux = random.randint(min_port, max_port)
+
+        values.append(aux)
+
+    return values
 
 class PortList():
 
@@ -43,15 +66,18 @@ class PortList():
 
 class TocTocPorts():
 
-    def __init__(self, secret, slot=30, n_ports=4, destination=22, forbidden=[]):
+    def __init__(self, secret, slot=30, n_ports=4, destination=[]):
 
         self._secret = secret
         self._slot = slot
-        self._forbidden = forbidden
+
         self._destination = destination
 
-        if n_ports > 20:
-            raise Exception("Error, max ports: %d" % 20)
+        if n_ports < 1:
+            raise Exception("Error, at least %d ports needed" % 1)
+
+        if n_ports > 10:
+            raise Exception("Error, max ports: %d" % 10)
 
         self._n_ports = n_ports
 
@@ -61,26 +87,6 @@ class TocTocPorts():
         self._a = ports['a']
         self._n = ports['n']
         # time.sleep(ns)
-
-    # 1 < n < 10
-    def gen_ports(self, val):
-        values = []
-        for i in range(self._n_ports):
-            aux = totp.bytes2int(val[2*i:(2*i)+2])
-
-            min_port = (2 << 10) + 1
-            max_port = 2 << 13
-
-            # Value between min_port and max_port, from 2^16 values
-            aux = int(min_port + (max_port - min_port) * float(aux) / (2 << 16))
-
-            if aux < 1024:
-                aux += 1024
-            while aux in self._forbidden or aux in values or aux == self._destination:
-                aux += 1
-            values.append(aux)
-        return values
-
 
     def get_slot(self):
         return self._slot
@@ -92,7 +98,6 @@ class TocTocPorts():
         t = int(time.time())
         remainder = t % self._slot
         return self._slot - remainder
-
 
     def last(self):
         t = int(time.time())
@@ -107,7 +112,8 @@ class TocTocPorts():
 
         tcp = self.last() - self._slot
         valp = totp.totp(self._secret, tcp)
-        portsp = self.gen_ports(valp)
+
+        portsp = gen_ports_from_pin(valp, self._n_ports)
 
         return PortList(portsp)
 
@@ -115,7 +121,7 @@ class TocTocPorts():
 
         tca = self.last()
         vala = totp.totp(self._secret, tca)
-        portsa = self.gen_ports(vala)
+        portsa = gen_ports_from_pin(vala, self._n_ports)
 
         return PortList(portsa)
 
@@ -123,7 +129,7 @@ class TocTocPorts():
 
         tcn = self.last() + self._slot
         valn = totp.totp(self._secret, tcn)
-        portsn = self.gen_ports(valn)
+        portsn = gen_ports_from_pin(valn, self._n_ports)
 
         return PortList(portsn)
 
@@ -152,6 +158,7 @@ class TocTocPorts():
         res += " [*] NEXT_SLOT: %ds\n" % self.next()
         return res
 
+
 class TocTocPortsWorker(ProcWorker):
 
     def __init__(self, i_q, o_q, ttp):
@@ -176,4 +183,4 @@ class TocTocPortsWorker(ProcWorker):
         super(TocTocPortsWorker, self).process_evt(evt)
 
         if evt.get_id() == PortManagerEvent.LAST_PORT:
-            self._o.put(Event(TocTocPortsEvent.LAST_PORT, {'port': self._ttp.get_destination(), 'address': evt.get_value()['address']}))
+            self._o.put(Event(TocTocPortsEvent.LAST_PORT, {'ports': self._ttp.get_destination(), 'address': evt.get_value()['address']}))
