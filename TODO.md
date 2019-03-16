@@ -26,6 +26,16 @@
 
 - [ ] Refactor
 
+  - [ ] Organización del proyecto: https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html
+
+  - [ ] Limpiar tests: https://docs.pytest.org/en/latest/contents.html
+
+  - [ ] Buenas prácticas empaquetado: https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure
+
+  - [ ] Configurar bien travis (y gitlab ci): https://docs.travis-ci.com/user/tutorial/
+
+- [ ] Snyk o pyup
+
 - [ ] Best practices in logging: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 
 - [ ] See YAML or JSON config file: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
