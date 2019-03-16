@@ -1,14 +1,47 @@
 # TODO
 
-- [ ] Ajustar a RFC-6238
+- [ ] toc-toc-ssh -> c-lock
 
-- [ ] Make it work with previous/next time slots for clock issues.
+- [ ] https://codecov.io/
+
+- [ ] Travis badge
+
+- [ ] Snyk o pyup
+
+- [ ] En TocTocPorts sólo queremos los puertos actuales
+
+- [ ] ¿Centralizar eventos?
+
+- [x] Ajustar a RFC-6238
+
+- [ ] Colas para poder comunicarse con comandos (por ejemplo, para dejar abierto un puerto) (`feature/queue`, refered in `feature/snif`)
+
+  - [ ] Que todo guarde relación con los eventos de ProcWorker
+
+- [ ] Añadir compatibilidad con tokens de Google Authenticator
+
+  - [x] Not use secret to allow pin generation in ttp.gen_ports
+
+  - [x] Ver tamaño de clave de Authenticator para generarla igual
+
+  - [ ] Tratar de generar bidi por consola
+
+  - [x] Toc by pin
+
+  Cambiado hotp después de recibir valor `totp` por random con semilla
 
 - [ ] Al capturar error fatal, limpiar las reglas y dejar abierto el puerto de destino
 
-- [ ] El valor del último puerto tiene que estar en el manejador del resto de módulos, en TocTocPorts tiene que entrar sólo como un puerto prohibido.
-
 - [ ] Refactor
+
+  - [ ] Organización del proyecto: https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html
+
+  - [ ] Limpiar tests: https://docs.pytest.org/en/latest/contents.html
+
+  - [ ] Buenas prácticas empaquetado: https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure
+
+  - [ ] Configurar bien travis (y gitlab ci): https://docs.travis-ci.com/user/tutorial/
+
 
 - [ ] Best practices in logging: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 
@@ -16,15 +49,11 @@
 
 - [ ] Cerrar todos los thread
 
-- [ ] Cuando un puerto está ocupado: ¿Esperamos al siguiente slot o matamos el proceso?
-
 - [ ] Intentar mejorar todos los hilos (en especial, los de sockets)
 
 - [ ] Worker events -> Self file
 
-- [ ] Varios puertos destino (por ejemplo, sistema web, db...)
-
-- [ ] Hacer método de limpieza de mis reglas de IPTABLES
+- [x] Varios puertos destino (por ejemplo, sistema web, db...)
 
 - [ ] Clase orquestador
 
@@ -33,8 +62,6 @@
 - [ ] Hacer como servicio
 
 - [ ] Asegurar cierre (y sobre todo, limpieza de las iptables). Se puede hacer un proceso que compruebe que está corriendo.
-
-- [ ] Servidor web con configuración, generación de bidi para secreto...
 
 - [ ] Cómo evitar segmentation fault.
 

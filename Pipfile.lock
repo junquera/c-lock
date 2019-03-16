@@ -1,20 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e49a290e861b7f557f1f6d1a6d605cc53477a83bd3309aa71faeb972bd5b25c1"
-        },
-        "host-environment-markers": {
-            "implementation_name": "cpython",
-            "implementation_version": "3.6.3",
-            "os_name": "posix",
-            "platform_machine": "x86_64",
-            "platform_python_implementation": "CPython",
-            "platform_release": "4.13.0-37-generic",
-            "platform_system": "Linux",
-            "platform_version": "#42-Ubuntu SMP Wed Mar 7 14:13:23 UTC 2018",
-            "python_full_version": "3.6.3",
-            "python_version": "3.6",
-            "sys_platform": "linux"
+            "sha256": "43ee3165c6d9ab71396fe755b23289838e0884322661a8482a35418e1d3425a8"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -29,16 +16,28 @@
     "default": {
         "argparse": {
             "hashes": [
-                "sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314",
-                "sha256:62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4"
+                "sha256:62b089a55be1d8949cd2bc7e0df0bddb9e028faefc8c32038cc84862aefdd6e4",
+                "sha256:c31647edb69fd3d465a847ea3157d37bed1f95f19760b11a47aa91c04b666314"
             ],
+            "index": "pypi",
             "version": "==1.4.0"
         },
         "python-iptables": {
             "hashes": [
-                "sha256:9815fd5ba780fd14b5f8cf8a93e007c0e603019738813a806e37553cd72e4c33"
+                "sha256:53b09257467681d7ea547cd3140eccd8c70effb3748af4b56ffed2f6011189e7"
             ],
-            "version": "==0.12.0"
+            "index": "pypi",
+            "version": "==0.13.0"
+        },
+        "scapy": {
+            "hashes": [
+                "sha256:1baa048936207ceb1a4281a0e1e3b4317667c754872a0bb4734c5213c468e86a"
+            ],
+            "index": "pypi",
+            "version": "==2.4.2"
+        },
+        "tts": {
+            "path": "."
         }
     },
     "develop": {}
