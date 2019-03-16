@@ -1,14 +1,16 @@
-import tts.totp
+import tts.totp as totp
 from tts.proc_worker import Event, Broker, ProcWorkerEvent
-from tts.ttp import *
+from tts.ttp import TocTocPorts, TocTocPortsWorker
 from queue import Queue
 import time
 import os
 import logging
 
 import signal
+import argparse
 
 log = logging.getLogger(__name__)
+
 
 def check_environment():
 
@@ -17,7 +19,7 @@ def check_environment():
 
     try:
         import iptc
-    except Exception as e:
+    except Exception as _:
 
         if 'XTABLES_LIBDIR' not in os.environ:
             os.environ['XTABLES_LIBDIR'] = '/usr/lib/x86_64-linux-gnu/xtables'
@@ -97,10 +99,8 @@ def main_server(secret, slot, address, ports, opened):
     signal.signal(signal.SIGILL, end)
     # TODO Clase orquestador
 
-import argparse
 
 def main():
-
 
     log_levels = {
         'DEBUG': logging.DEBUG,
@@ -127,8 +127,9 @@ def main():
     log_level = args.log_level
 
     level = log_levels.get(log_level, logging.DEBUG)
+
     logging.basicConfig(
-        level= level,
+        level=level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
@@ -146,17 +147,17 @@ def main():
     else:
 
         if args.gen_secret:
-            secret = totp.gen_secret()
-            print("TOTP generated secret: %s" % secret)
+            i_secret = totp.gen_secret()
+            print("TOTP generated secret: %s" % i_secret)
         elif not args.secret:
             log.error("A secret is required to start")
             parser.print_help()
             return
         else:
-            secret = args.secret
+            i_secret = args.secret
 
         try:
-            secret = totp.web_secret_2_bytes(secret)
+            secret = totp.web_secret_2_bytes(i_secret)
         except Exception as e:
             log.error("Bad secret: Remember secret = b32(secret_bytes)")
             return

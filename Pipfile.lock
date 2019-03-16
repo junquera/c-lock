@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "293439811b94d3d3157aa97f48a634b293df28d1cc718fb7040a7e61d0d9a2d0"
+            "sha256": "43ee3165c6d9ab71396fe755b23289838e0884322661a8482a35418e1d3425a8"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -35,6 +35,9 @@
             ],
             "index": "pypi",
             "version": "==2.4.2"
+        },
+        "tts": {
+            "path": "."
         }
     },
     "develop": {}
