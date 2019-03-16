@@ -1,5 +1,5 @@
-from proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
-import totp
+from .proc_worker import ProcWorker, Event, PortManagerEvent, TocTocPortsEvent
+from . import totp
 import time
 import threading
 import logging

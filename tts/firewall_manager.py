@@ -1,4 +1,4 @@
-from proc_worker import ProcWorker, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
+from .proc_worker import ProcWorker, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
 import uuid
 import logging
 import threading

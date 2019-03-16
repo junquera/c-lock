@@ -18,8 +18,8 @@ def xor(a, b):
 
     c = b''
 
-    a = a.ljust(len(b), '\0')
-    b = b.ljust(len(a), '\0')
+    a = a.ljust(len(b), b'\0')
+    b = b.ljust(len(a), b'\0')
 
     for i in range(len(a)):
         c += b'%c' % (a[i] ^ b[i])
@@ -34,13 +34,13 @@ def hmac(K, m):
     else:
         k = K
 
-    k = k.ljust(block_size, '\0')
+    k = k.ljust(block_size, b'\0')
 
     o_key_pad = k.translate(opad) # xor(k, k.translate(opad))
     i_key_pad = k.translate(ipad) # xor(k, k.translate(ipad))
 
-    inner = hash_alg(codecs.encode(i_key_pad))
-    outer = hash_alg(codecs.encode(o_key_pad))
+    inner = hash_alg(i_key_pad)
+    outer = hash_alg(o_key_pad)
 
     inner.update(m)
     outer.update(inner.digest())

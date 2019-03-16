@@ -1,10 +1,7 @@
-
 import socket, sys
 from struct import *
 import threading
-from proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, TocTocPortsEvent, PortManagerEvent
-
-from client import touch
+from .proc_worker import ProcWorker, Event, bypass, ProcWorkerEvent, TocTocPortsEvent, PortManagerEvent
 
 import logging
 
@@ -87,6 +84,7 @@ class PortManager():
 
     def close(self):
         self.unlock_threads()
+
 
 # https://eli.thegreenplace.net/2011/12/27/python-threads-communication-and-stopping
 # http://www.bogotobogo.com/python/Multithread/python_multithreading_Event_Objects_between_Threads.php

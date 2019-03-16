@@ -1,8 +1,8 @@
-import totp
+import tts.totp as totp
 import codecs
 
 K = 0x3132333435363738393031323334353637383930
-S = codecs.decode(codecs.decode("%x" % K, "hex"))
+S = codecs.decode("%x" % K, "hex")
 
 
 # OTP TEST
@@ -38,14 +38,3 @@ def test_totp():
     assert totp.totp(S, 59, n=8) == 94287082
     assert totp.totp(S, 1111111109, n=8) == 7081804
     assert totp.totp(S, 1234567890, n=8) == 89005924
-    # assert totp.totp(S, t)
-
-
-def main():
-    test_otp()
-    test_hotp()
-    test_totp()
-
-
-if __name__ == '__main__':
-    main()

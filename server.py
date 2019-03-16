@@ -1,6 +1,6 @@
-import totp
-from proc_worker import Event, Broker, ProcWorkerEvent
-from ttp import *
+import tts.totp
+from tts.proc_worker import Event, Broker, ProcWorkerEvent
+from tts.ttp import *
 from queue import Queue
 import time
 import os
@@ -36,8 +36,8 @@ def main_server(secret, slot, address, ports, opened):
 
     log.debug("Secret: %s" % secret)
 
-    from port_manager import PortManagerWorker, PortManager
-    from firewall_manager import FirewallManager, FirewallManagerWorker
+    from tts.port_manager import PortManagerWorker, PortManager
+    from tts.firewall_manager import FirewallManager, FirewallManagerWorker
 
     oq = Queue()
     bq = Queue()
@@ -140,7 +140,7 @@ def main():
             log.error(e)
             exit(-1)
 
-        from firewall_manager import FirewallManager
+        from tts.firewall_manager import FirewallManager
 
         FirewallManager().clean_firewall()
     else:
