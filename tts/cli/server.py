@@ -56,7 +56,7 @@ def main_server(secret, slot, address, ports, opened):
 
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManager(address, protected_ports=opened)
+    pm = PortManager(address, unmanaged_ports=opened)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
     ttpq = Queue()

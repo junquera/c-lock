@@ -11,12 +11,12 @@ from scapy.all import sniff, IP, TCP
 
 class PortManager():
 
-    def __init__(self, address='0.0.0.0', protected_ports=[]):
+    def __init__(self, address='0.0.0.0', unmanaged_ports=[]):
 
         self._sockets = []
         self._threads = []
         self._address = address
-        self._protected_ports = protected_ports
+        self._unmanaged_ports = unmanaged_ports
 
         try:
 
@@ -54,7 +54,7 @@ class PortManager():
                     addr_info['next'] = self._port_list[next_n]
                     self._active[addr] = addr_info
             else:
-                if port not in self._protected_ports:
+                if port not in self._unmanaged_ports:
                     del self._active[addr]
         else:
             if self._port_list[0] == port:
