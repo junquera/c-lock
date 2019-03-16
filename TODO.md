@@ -2,6 +2,12 @@
 
 - [ ] toc-toc-ssh -> c-lock
 
+- [ ] https://codecov.io/
+
+- [ ] Travis badge
+
+- [ ] Snyk o pyup
+
 - [ ] En TocTocPorts sólo queremos los puertos actuales
 
 - [ ] ¿Centralizar eventos?
@@ -36,7 +42,6 @@
 
   - [ ] Configurar bien travis (y gitlab ci): https://docs.travis-ci.com/user/tutorial/
 
-- [ ] Snyk o pyup
 
 - [ ] Best practices in logging: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 
