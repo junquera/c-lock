@@ -42,32 +42,29 @@
 
   - [ ] Configurar bien travis (y gitlab ci): https://docs.travis-ci.com/user/tutorial/
 
-
 - [ ] Best practices in logging: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 
 - [ ] See YAML or JSON config file: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
 
-- [ ] Cerrar todos los thread
+- [x] Cerrar todos los thread
 
-- [ ] Intentar mejorar todos los hilos (en especial, los de sockets)
+- [x] Intentar mejorar todos los hilos (en especial, los de sockets)
 
 - [ ] Worker events -> Self file
 
-- [x] Varios puertos destino (por ejemplo, sistema web, db...)
-
 - [ ] Clase orquestador
-
-- [ ] Extraer método lock de asíncronos
 
 - [ ] Hacer como servicio
 
 - [ ] Asegurar cierre (y sobre todo, limpieza de las iptables). Se puede hacer un proceso que compruebe que está corriendo.
 
+  - [ ] Conectar al sniffer para que se pueda cerrar
+
 - [ ] Cómo evitar segmentation fault.
 
 - [ ] Time with NTP
 
-- [ ] Project reestructure
+- [z] Project reestructure
 
 ### Para versión 0.0.2 (alpha-2)
 

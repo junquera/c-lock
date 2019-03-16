@@ -10,16 +10,4 @@ El nuevo sistema tiene dos posibilidades:
 
 - FT/SNIFF/03: Probar con NFQUEUE (feature/queue)
 
-Tengo que tirar de scapy en lugar del sniffer *artesanal* porque con el firewall el sniffer manual no recibe los paquetes (es un socket escuchando).
-
-## TODO
-
-- [x] Cambiar port manager
-
-- [x] Set behaviour for multiple protected ports (in ttp)
-
-- [x] Cambiar reglas del firewall
-
-  - [x] Hacer que al arrancar, abra los puertos especificados como abiertos
-
-- [ ] Test
+Al final he tenido que utilizar scapy en lugar del sniffer *artesanal* porque con el firewall el sniffer manual no recibe los paquetes (es un socket escuchando).
