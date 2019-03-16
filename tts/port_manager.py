@@ -54,7 +54,7 @@ class PortManager():
                     addr_info['next'] = self._port_list[next_n]
                     self._active[addr] = addr_info
             else:
-                if not port in self._protected_ports:
+                if port not in self._protected_ports:
                     del self._active[addr]
         else:
             if self._port_list[0] == port:

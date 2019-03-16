@@ -94,7 +94,7 @@ def str2hexs(s):
 def web_secret_2_bytes(s):
 
     norm = s.replace(' ', '')
-    norm += '=' * (len(norm) % 5)
+    norm += '=' * (len(norm) % 8)
     key = base64.b32decode(norm)
 
     return key
