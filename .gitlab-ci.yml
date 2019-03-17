@@ -4,5 +4,6 @@ test:
     - apt-get update -qy
     - apt-get install -y python3 python3-pip
     - pip3 install -r requirements.txt
+    - pip3 install pytest
     - pytest
     
