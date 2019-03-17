@@ -1,4 +1,4 @@
-from .proc_worker import ProcWorker, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
+from .proc_worker import ProcWorker, ProcWorkerEvent, TocTocPortsEvent
 import uuid
 import logging
 import threading
@@ -170,7 +170,7 @@ class FirewallManager():
         chain.flush()
         chain.delete()
 
-    def close(self):
+    def finish(self):
         self.clean_firewall()
         self.restore()
 
@@ -337,7 +337,7 @@ class FirewallManagerWorker(ProcWorker):
 
         if evt.get_id() == ProcWorkerEvent.END:
             self._rule_manager.close()
-            self._fwm.close()
+            self._fwm.finish()
 
         if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()

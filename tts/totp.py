@@ -2,7 +2,6 @@
 # from hashlib import sha256 as hash_alg
 from hashlib import sha1 as hash_alg
 import codecs
-import time
 import secrets
 import base64
 
