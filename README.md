@@ -2,6 +2,7 @@
 
 # toc-toc-ssh
 
+[![Build Status](https://travis-ci.org/junquera/toc-toc-ssh.svg?branch=master)](https://travis-ci.org/junquera/toc-toc-ssh)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/context:python)
 
@@ -157,6 +158,8 @@ For example, its obvious that I need help with documentation images, design, log
 - @ldx [python-iptables](https://github.com/ldx/python-iptables)
 
 - @jonschlinkert [markdown-toc](https://github.com/jonschlinkert/markdown-toc)
+
+- @mnooner256 [pyqrcode](https://github.com/mnooner256/pyqrcode)
 
 ## License
 

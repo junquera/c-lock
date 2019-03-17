@@ -1,3 +1,4 @@
-argparse
+argparse==1.4.0
 python-iptables==0.13.0
 scapy==2.4.2
+pyqrcode==1.2.1
