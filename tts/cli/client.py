@@ -2,14 +2,15 @@ from tts.ttp import TocTocPorts, gen_ports_from_pin
 from tts import totp
 import socket
 import time
-
+import argparse
 import logging
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
-    level= logging.DEBUG,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
 
 def touch(address, port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,20 +19,21 @@ def touch(address, port):
         log.info("Touching %d" % port)
         s.connect((address, port))
         s.close()
-    except Exception as e:
+    except Exception as _:
         pass
+
 
 def toc_ports(values, address):
 
     for value in values:
 
         touch(address, value)
-
+        # TODO Probar si esto es realmente necesario
         time.sleep(0.2)
 
     log.debug("Knock finished")
 
-import argparse
+
 def main():
 
     parser = argparse.ArgumentParser(description='Launch TOTP based port knocking protection')
@@ -54,7 +56,7 @@ def main():
 
         try:
             secret = totp.web_secret_2_bytes(args.secret)
-        except Exception as e:
+        except Exception as _:
             log.error("Bad secret: Remember secret = b32(secret_bytes)")
             return
 
@@ -67,8 +69,8 @@ def main():
     else:
         raise Exception("Set secret or pin")
 
-
     toc_ports(ports, address)
+
 
 if __name__ == '__main__':
     main()

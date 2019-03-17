@@ -1,4 +1,4 @@
-from .proc_worker import ProcWorker, ProcWorkerEvent, PortManagerEvent, TocTocPortsEvent
+from .proc_worker import ProcWorker, ProcWorkerEvent, TocTocPortsEvent
 import uuid
 import logging
 import threading
@@ -40,6 +40,14 @@ class FirewallManager():
         # toc-toc-ssh config
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
 
+        '''
+        TODO 1b53c7b5-55d7-4834-9719-1ef86a7bfe12
+        if unmanaged_ports:
+            OPEN(unmanaged_ports)
+            DROP_ALL
+        else:
+            DROP (PROTECTED_PORTS)
+        '''
         # Drop all the rest
         rule = iptc.Rule()
         rule.protocol = "tcp"
@@ -63,7 +71,6 @@ class FirewallManager():
         rule.src = "127.0.0.1"
         rule.target = iptc.Target(rule, "ACCEPT")
         chain.insert_rule(rule)
-
 
         # TODO Not working right
         # Accept all output connections
@@ -170,7 +177,7 @@ class FirewallManager():
         chain.flush()
         chain.delete()
 
-    def close(self):
+    def finish(self):
         self.clean_firewall()
         self.restore()
 
@@ -183,8 +190,6 @@ class FirewallManager():
         pass
 
 
-
-# TODO Pasar ar ProcWorker
 class RuleManager(threading.Thread):
 
     rules = {}
@@ -337,7 +342,7 @@ class FirewallManagerWorker(ProcWorker):
 
         if evt.get_id() == ProcWorkerEvent.END:
             self._rule_manager.close()
-            self._fwm.close()
+            self._fwm.finish()
 
         if evt.get_id() == TocTocPortsEvent.LAST_PORT:
             evt_value = evt.get_value()
@@ -352,7 +357,6 @@ class FirewallManagerWorker(ProcWorker):
             else:
                 # TODO Implementar esto si determinamos usar FT/SNIFF/O2
                 self.open(s_address=addr, caducity=30, protected=True)
-
 
         if evt.get_id() == TocTocPortsEvent.NEW_SLOT:
             # TODO ¿Close o borrar las reglas guardadas?
