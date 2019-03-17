@@ -160,6 +160,8 @@ For example, its obvious that I need help with documentation images, design, log
 
 - @jonschlinkert [markdown-toc](https://github.com/jonschlinkert/markdown-toc)
 
+- @mnooner256 [pyqrcode](https://github.com/mnooner256/pyqrcode)
+
 ## License
 
 ```
