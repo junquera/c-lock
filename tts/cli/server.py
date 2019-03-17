@@ -6,6 +6,8 @@ import time
 import os
 import logging
 
+from tts.bidi import OTPBidi
+
 import signal
 import argparse
 
@@ -147,19 +149,25 @@ def main():
     else:
 
         if args.gen_secret:
+
             i_secret = totp.gen_secret()
+
+            otp_bidi = OTPBidi(i_secret)
+
             print("TOTP generated secret: %s" % i_secret)
-        elif not args.secret:
+            print(otp_bidi.generate())
+
+        elif args.secret:
+            i_secret = args.secret
+        else:
             log.error("A secret is required to start")
             parser.print_help()
             return
-        else:
-            i_secret = args.secret
 
         try:
             secret = totp.web_secret_2_bytes(i_secret)
         except Exception as e:
-            log.error("Bad secret: Remember secret = b32(secret_bytes)")
+            log.error("Bad secret: Remember secret must be b32")
             return
 
         slot = args.slot
