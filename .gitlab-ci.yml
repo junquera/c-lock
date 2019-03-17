@@ -1,0 +1,8 @@
+# Reading https://docs.gitlab.com/ee/ci/examples/test-and-deploy-python-application-to-heroku.html
+test:
+    script:
+    - apt-get update -qy
+    - apt-get install -y python3
+    - pip install -r requirements.txt
+    - pytest
+    
