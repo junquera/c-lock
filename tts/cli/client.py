@@ -28,8 +28,6 @@ def toc_ports(values, address):
     for value in values:
 
         touch(address, value)
-        # TODO Probar si esto es realmente necesario
-        time.sleep(0.2)
 
     log.debug("Knock finished")
 
