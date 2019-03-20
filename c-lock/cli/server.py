@@ -1,12 +1,12 @@
-import tts.totp as totp
-from tts.proc_worker import Event, Broker, ProcWorkerEvent
-from tts.ttp import TocTocPorts, TocTocPortsWorker
+import clock.totp as totp
+from clock.proc_worker import Event, Broker, ProcWorkerEvent
+from clock.ttp import TocTocPorts, TocTocPortsWorker
 from queue import Queue
 import time
 import os
 import logging
 
-from tts.bidi import OTPBidi
+from clock.bidi import OTPBidi
 
 import signal
 import argparse
@@ -40,8 +40,8 @@ def main_server(secret, slot, address, ports, opened):
 
     log.debug("Secret: %s" % secret)
 
-    from tts.port_manager import PortManagerWorker, PortManager
-    from tts.firewall_manager import FirewallManager, FirewallManagerWorker
+    from clock.port_manager import PortManagerWorker, PortManager
+    from clock.firewall_manager import FirewallManager, FirewallManagerWorker
 
     oq = Queue()
     bq = Queue()
@@ -143,7 +143,7 @@ def main():
             log.error(e)
             exit(-1)
 
-        from tts.firewall_manager import FirewallManager
+        from clock.firewall_manager import FirewallManager
 
         FirewallManager().clean_firewall()
     else:
