@@ -11,10 +11,7 @@ test:
 pages:
   stage: deploy
   script:
-    - mkdir .public
-    - cp README.md .public/
-    - cp -r doc .public/
-    - mv .public public
+    - bundle exec jekyll build -d public/
   artifacts:
     paths:
       - public
