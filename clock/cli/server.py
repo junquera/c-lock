@@ -146,23 +146,18 @@ def main():
         from clock.firewall_manager import FirewallManager
 
         FirewallManager().clean_firewall()
-    else:
 
-        if args.gen_secret:
+    elif args.gen_secret:
 
-            i_secret = totp.gen_secret()
+        i_secret = totp.gen_secret()
 
-            otp_bidi = OTPBidi(i_secret)
+        otp_bidi = OTPBidi(i_secret)
 
-            print("TOTP generated secret: %s" % i_secret)
-            print(otp_bidi.generate())
+        print("TOTP generated secret: %s" % i_secret)
+        print(otp_bidi.generate())
 
-        elif args.secret:
-            i_secret = args.secret
-        else:
-            log.error("A secret is required to start")
-            parser.print_help()
-            return
+    elif args.secret:
+        i_secret = args.secret
 
         try:
             secret = totp.web_secret_2_bytes(i_secret)
@@ -179,6 +174,11 @@ def main():
 
         main_server(secret, slot, address, ports, opened)
 
+
+    else:
+        log.error("A secret is required to start")
+        parser.print_help()
+        return
 
 if __name__ == '__main__':
     main()
