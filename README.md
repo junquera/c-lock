@@ -11,7 +11,7 @@ A TOTP based port knocking service. Every time slot, it generates a sequence of 
 
 <!-- https://dashboard.moovly.com -->
 
-![c-lock Process](img/clock-process.gif)
+![c-lock Process](doc/img/clock-process.gif)
 
 > Yeah, I'm not very good with graphics...
 
@@ -146,7 +146,7 @@ optional arguments:
 
 This is how it shows when a client interacts with the server:
 
-![Working example](img/working_example.png)
+![Working example](doc/img/working_example.png)
 
 ## Contributing
 
