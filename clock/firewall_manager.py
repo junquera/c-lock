@@ -22,9 +22,9 @@ class FirewallManager():
 
         # Crear chain
         try:
-            table.create_chain("toc-toc-ssh")
+            table.create_chain("c-lock")
         except Exception as e:
-            log.debug("toc-toc-ssh exists!")
+            log.debug("c-lock exists!")
 
 
         # TODO ¿Debería venir desde ACCEPT?
@@ -32,13 +32,13 @@ class FirewallManager():
         # TODO Añadir que mande aquí todos los puertos protegidos, o todas las conexiones si se protege todo
         rule = iptc.Rule() # *
         rule.protocol = "tcp"
-        # Apuntar INPUT a toc-toc-ssh
-        rule.target = iptc.Target(rule, "toc-toc-ssh")
+        # Apuntar INPUT a c-lock
+        rule.target = iptc.Target(rule, "c-lock")
         chain.insert_rule(rule, position=len(chain.rules))
 
 
-        # toc-toc-ssh config
-        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "toc-toc-ssh")
+        # c-lock config
+        chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "c-lock")
 
         '''
         TODO 1b53c7b5-55d7-4834-9719-1ef86a7bfe12
@@ -84,7 +84,7 @@ class FirewallManager():
     #
     #     table = iptc.Table(iptc.Table.FILTER)
     #
-    #     chain = iptc.Chain(table, "toc-toc-ssh-unmanaged")
+    #     chain = iptc.Chain(table, "c-lock-unmanaged")
     #
     #     rule = iptc.Rule() # *
     #     rule.protocol = "tcp"
@@ -127,7 +127,7 @@ class FirewallManager():
         # TODO Evitar insertar reglas repetidas
         table = iptc.Table(iptc.Table.FILTER)
 
-        chain = iptc.Chain(table, "toc-toc-ssh")
+        chain = iptc.Chain(table, "c-lock")
 
         rule = self.gen_rule(d_port, s_address, open=True)
 
@@ -138,7 +138,7 @@ class FirewallManager():
     def close(self, d_port=None, s_address=None):
         table = iptc.Table(iptc.Table.FILTER)
 
-        chain = iptc.Chain(table, "toc-toc-ssh")
+        chain = iptc.Chain(table, "c-lock")
 
         rule = self.gen_rule(d_port, s_address, open=False)
 
@@ -150,13 +150,13 @@ class FirewallManager():
 
         table = iptc.Table(iptc.Table.FILTER)
 
-        chain = iptc.Chain(table, "toc-toc-ssh")
+        chain = iptc.Chain(table, "c-lock")
         chain.insert_rule(rule)
 
     def delete_rule(self, rule):
         table = iptc.Table(iptc.Table.FILTER)
 
-        chain = iptc.Chain(table, "toc-toc-ssh")
+        chain = iptc.Chain(table, "c-lock")
         chain.delete_rule(rule)
 
     def clean_firewall(self):
@@ -167,13 +167,13 @@ class FirewallManager():
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         rule = iptc.Rule()
         rule.protocol = "tcp"
-        rule.target = iptc.Target(rule, "toc-toc-ssh")
+        rule.target = iptc.Target(rule, "c-lock")
 
         # TODO Ver como usar esto sin borrar otras reglas del firewall
         while rule in chain.rules:
             chain.delete_rule(rule)
 
-        chain = iptc.Chain(table, "toc-toc-ssh")
+        chain = iptc.Chain(table, "c-lock")
         chain.flush()
         chain.delete()
 

@@ -1,17 +1,17 @@
 ![doc/img/c-lock.png](doc/img/c-lock.png)
 
-# toc-toc-ssh
+# c-lock
 
-[![Build Status](https://travis-ci.org/junquera/toc-toc-ssh.svg?branch=master)](https://travis-ci.org/junquera/toc-toc-ssh)
-[![Known Vulnerabilities](https://snyk.io/test/github/junquera/toc-toc-ssh/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/junquera/toc-toc-ssh?targetFile=requirements.txt)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/junquera/toc-toc-ssh.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/toc-toc-ssh/context:python)
+[![Build Status](https://travis-ci.org/junquera/c-lock.svg?branch=master)](https://travis-ci.org/junquera/c-lock)
+[![Known Vulnerabilities](https://snyk.io/test/github/junquera/c-lock/badge.svg?targetFile=requirements.txt)](https://snyk.io/test/github/junquera/c-lock?targetFile=requirements.txt)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/junquera/c-lock.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/c-lock/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/junquera/c-lock.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/c-lock/context:python)
 
 A TOTP based port knocking service. Every time slot, it generates a sequence of ports that must be *knocked* (in a correct order) before the final port (it have been designed for protecting a SSH service) becames opened.
 
 <!-- https://dashboard.moovly.com -->
 
-![TTS Process](img/tts-process.gif)
+![c-lock Process](img/clock-process.gif)
 
 > Yeah, I'm not very good with graphics...
 
