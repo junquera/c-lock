@@ -1,4 +1,4 @@
-import c-lock.totp as totp
+import clock.totp as totp
 import codecs
 
 K = 0x3132333435363738393031323334353637383930
