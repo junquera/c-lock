@@ -10,10 +10,13 @@ test:
 # the 'pages' job will deploy and build your site to the 'public' path
 pages:
   stage: deploy
-#  script:
-#    - bundle exec jekyll build -d public/
+  script:
+    - mkdir .public
+    - cp README.md .public/
+    - cp -r doc .public/
+    - mv .public public
   artifacts:
     paths:
-      - /
+      - public
   only:
     - master # this job will affect only the 'master' branch
