@@ -1,12 +1,12 @@
-import tts.totp as totp
-from tts.proc_worker import Event, Broker, ProcWorkerEvent
-from tts.ttp import TocTocPorts, TocTocPortsWorker
+import clock.totp as totp
+from clock.proc_worker import Event, Broker, ProcWorkerEvent
+from clock.ttp import TocTocPorts, TocTocPortsWorker
 from queue import Queue
 import time
 import os
 import logging
 
-from tts.bidi import OTPBidi
+from clock.bidi import OTPBidi
 
 import signal
 import argparse
@@ -40,8 +40,8 @@ def main_server(secret, slot, address, ports, opened):
 
     log.debug("Secret: %s" % secret)
 
-    from tts.port_manager import PortManagerWorker, PortManager
-    from tts.firewall_manager import FirewallManager, FirewallManagerWorker
+    from clock.port_manager import PortManagerWorker, PortManager
+    from clock.firewall_manager import FirewallManager, FirewallManagerWorker
 
     oq = Queue()
     bq = Queue()
@@ -143,26 +143,21 @@ def main():
             log.error(e)
             exit(-1)
 
-        from tts.firewall_manager import FirewallManager
+        from clock.firewall_manager import FirewallManager
 
         FirewallManager().clean_firewall()
-    else:
 
-        if args.gen_secret:
+    elif args.gen_secret:
 
-            i_secret = totp.gen_secret()
+        i_secret = totp.gen_secret()
 
-            otp_bidi = OTPBidi(i_secret)
+        otp_bidi = OTPBidi(i_secret)
 
-            print("TOTP generated secret: %s" % i_secret)
-            print(otp_bidi.generate())
+        print("TOTP generated secret: %s" % i_secret)
+        print(otp_bidi.generate())
 
-        elif args.secret:
-            i_secret = args.secret
-        else:
-            log.error("A secret is required to start")
-            parser.print_help()
-            return
+    elif args.secret:
+        i_secret = args.secret
 
         try:
             secret = totp.web_secret_2_bytes(i_secret)
@@ -179,6 +174,11 @@ def main():
 
         main_server(secret, slot, address, ports, opened)
 
+
+    else:
+        log.error("A secret is required to start")
+        parser.print_help()
+        return
 
 if __name__ == '__main__':
     main()

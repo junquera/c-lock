@@ -1,5 +1,5 @@
-from tts.ttp import TocTocPorts, gen_ports_from_pin
-from tts import totp
+from clock.ttp import TocTocPorts, gen_ports_from_pin
+from clock import totp
 import socket
 import time
 import argparse
