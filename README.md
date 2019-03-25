@@ -69,6 +69,25 @@ pip3 install -r requeriments.txt
 
 ## Usage
 
+### Step 1
+
+![doc/img/demo/gen_NPAR2VWV5HX5BI4BIE6PKWUROWYHJE3CCGWZYVBT6AJ2H3DGFKZA.png](doc/img/demo/gen_NPAR2VWV5HX5BI4BIE6PKWUROWYHJE3CCGWZYVBT6AJ2H3DGFKZA.png)
+
+### Step 2
+
+![doc/img/demo/latch.png](doc/img/demo/latch.png)
+![doc/img/demo/g_authenticator.png](doc/img/demo/g_authenticator.png)
+
+### Step 3 (server)
+
+
+### Step 3 (client pin)
+
+
+### Step 3 (client secret)
+
+
+
 First of all, you need to get a secret for initialize the TOTP system:
 
 ```
