@@ -164,9 +164,13 @@ optional arguments:
 
 ## Examples
 
-This is how it shows when a client interacts with the server:
+### Client
 
-![Working example](doc/img/working_example.png)
+[![asciicast](https://asciinema.org/a/v3LV7Ss5VaSBvqtWe9VdPVSLV.svg)](https://asciinema.org/a/v3LV7Ss5VaSBvqtWe9VdPVSLV)
+
+### Server
+
+[![asciicast](https://asciinema.org/a/z6O3qOZFCDDkQhnm3NkICOUYL.svg)](https://asciinema.org/a/z6O3qOZFCDDkQhnm3NkICOUYL)
 
 ## Contributing
 
