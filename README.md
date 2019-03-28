@@ -166,9 +166,27 @@ optional arguments:
 
 ### Client
 
+In this example:
+
+1. Client scans server ports without c-lockd actived
+
+2. When `c-lockd` is working in the server, just the opened ports can be scaned
+
+3. Use `c-lock` with pin
+
+4. The protected ports are now visible fron the client
+
 [![asciicast](https://asciinema.org/a/v3LV7Ss5VaSBvqtWe9VdPVSLV.svg)](https://asciinema.org/a/v3LV7Ss5VaSBvqtWe9VdPVSLV)
 
 ### Server
+
+This is the server where the client points:
+
+1. Generates the secret for the pin generation
+
+2. Starts `c-lockd` server opening ports `80` and `5432`, and closing port `22`
+
+3. When the client uses the correct port combination, it opens the protected port for 30 seconds
 
 [![asciicast](https://asciinema.org/a/z6O3qOZFCDDkQhnm3NkICOUYL.svg)](https://asciinema.org/a/z6O3qOZFCDDkQhnm3NkICOUYL)
 
