@@ -6,8 +6,8 @@ setup(
     packages=find_packages(),
     entry_points=dict(
         console_scripts= [
-            'clockd=clock.cli.server:main',
-            'clock=clock.cli.client:main'
+            'c-lockd=clock.cli.server:main',
+            'c-lock=clock.cli.client:main'
         ]
     )
 )
