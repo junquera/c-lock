@@ -25,12 +25,17 @@ A TOTP based port knocking service. Every time slot, it generates a sequence of 
   * [System dependencies](#system-dependencies)
   * [Software dependencies](#software-dependencies)
 - [Usage](#usage)
+  * [Step 1 - Server setup](#step-1---server-setup)
+  * [Step 2 - Setup 2fa applications](#step-2---setup-2fa-applications)
+  * [Step 3 (server) - Start server side](#step-3-server---start-server-side)
+  * [Step 3 (client) - Port knocking using TOTP pin](#step-3-client---port-knocking-using-totp-pin)
+  * [Step 3 (client) - Port knocking using secret](#step-3-client---port-knocking-using-secret)
+  * [Step 4 - Connect to your protected service =)](#step-4---connect-to-your-protected-service-)
   * [Server](#server)
   * [Client](#client)
 - [Examples](#examples)
 - [Contributing](#contributing)
 - [Credits](#credits)
-- [License](#license)
 
 <!-- tocstop -->
 
@@ -69,23 +74,51 @@ pip3 install -r requeriments.txt
 
 ## Usage
 
-First of all, you need to get a secret for initialize the TOTP system:
+### Step 1 - Server setup
 
-```
-$ python3 server.py --gen-secret
-TOTP Secret: 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee081fb2430126253563b03836b6e1a1
+```shell
+$ c-lockd --gen-secret
 ```
 
-Then you can run `server.py` with this secret.
+![doc/img/demo/scan_qr.png](doc/img/demo/scan_qr.png)
+
+### Step 2 - Setup 2fa applications
+
+![doc/img/demo/2fa_app.png](doc/img/demo/2fa_app.png)
+
+### Step 3 (server) - Start server side
+
+```shell
+# For example, protecting SSH port
+$ c-lockd --secret NPAR2VWV5HX5BI4BIE6PKWUROWYHJE3CCGWZYVBT6AJ2H3DGFKZA -p 22
+```
+
+### Step 3 (client) - Port knocking using TOTP pin
+
+```shell
+$ c-lock --address $SERVER_ADDRESS --pin 084678
+```
+
+### Step 3 (client) - Port knocking using secret
+
+```shell
+$ c-lock --address $SERVER_ADDRESS --secret NPAR2VWV5HX5BI4BIE6PKWUROWYHJE3CCGWZYVBT6AJ2H3DGFKZA
+```
+
+### Step 4 - Connect to your protected service =)
+
+```shell
+ssh $USER@$SERVER_ADDRESS
+```
 
 ### Server
 
-Must be launch as root (for managing the *iptables* rules):
+Must be launched as root (for managing the *iptables* rules):
 
 ```
-usage: server.py [-h] [-ts SLOT] [-f FORBIDDEN [FORBIDDEN ...]] [-a ADDRESS]
-                 [-s SECRET] [-p PROTECTED_PORT] [--gen-secret]
-                 [--clean-firewall] [--log-level LOG_LEVEL]
+usage: c-lockd [-h] [-ts SLOT] [-a ADDRESS] [-s SECRET] [-p PROTECTED_PORTS]
+               [-o OPENED_PORTS] [--gen-secret] [--clean-firewall]
+               [--log-level LOG_LEVEL]
 
 Launch TOTP based port knocking protection
 
@@ -93,42 +126,25 @@ optional arguments:
   -h, --help            show this help message and exit
   -ts SLOT, --time-slot SLOT
                         Time slot for TOTP
-  -f FORBIDDEN [FORBIDDEN ...], --forbidden FORBIDDEN [FORBIDDEN ...]
-                        Ports already in use or not manageable (space
-                        separated)
   -a ADDRESS, --address ADDRESS
                         Address to protect
   -s SECRET, --secret SECRET
                         Secret part of TOTP
-  -p PROTECTED_PORT, --protected-port PROTECTED_PORT
+  -p PROTECTED_PORTS, --protected-ports PROTECTED_PORTS
                         Port which has to be protected
+  -o OPENED_PORTS, --opened-ports OPENED_PORTS
+                        Port which should be opened
   --gen-secret          Generate random secret
   --clean-firewall      Clean firewall configuration (e.g., after a bad close)
   --log-level LOG_LEVEL
                         Log level
-```
 
-The most simple usage is:
-
-```
-$ sudo python3 server.py -s 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee081fb2430126253563b03836b6e1a1
-
-2018-03-25 13:27:20,831 - __main__ - DEBUG - Secret: 12e76644abf4eb34cf3d163fa058332c610d80d7cbe5b069ee081fb2430126253563b03836b6e1a1
-2018-03-25 13:27:20,907 - firewall_manager - DEBUG - Starting FirewallManager
-2018-03-25 13:27:20,912 - ttp - DEBUG - Next slot in 10s
-2018-03-25 13:27:20,912 - port_manager - DEBUG - First port: 8289
-2018-03-25 13:27:20,913 - port_manager - INFO - Opening 8289
-2018-03-25 13:27:20,913 - port_manager - INFO - Opening 3913
-2018-03-25 13:27:20,913 - firewall_manager - INFO - Opening first port 8289
-2018-03-25 13:27:20,914 - port_manager - INFO - Opening 4852
-2018-03-25 13:27:20,915 - port_manager - INFO - Opening 6218
-2018-03-25 13:27:20,915 - firewall_manager - DEBUG - Adding rule 23c8aae9-31d3-4cc6-a50d-9f14bc9eccf1 -> <iptc.ip4tc.Rule object at 0x7fcacd6b6940>
 ```
 
 ### Client
 
 ```
-usage: client.py [-h] [-ts SLOT] -a ADDRESS -s SECRET
+usage: c-lock [-h] [-ts SLOT] -a ADDRESS [-s SECRET] [-p PIN] [-n PORTS]
 
 Launch TOTP based port knocking protection
 
@@ -140,13 +156,39 @@ optional arguments:
                         Address to knock
   -s SECRET, --secret SECRET
                         Secret part of TOTP
+  -p PIN, --pin PIN     TOTP pin
+  -n PORTS, --ports PORTS
+                        Number of ports configured
+
 ```
 
 ## Examples
 
-This is how it shows when a client interacts with the server:
+### Client
 
-![Working example](doc/img/working_example.png)
+In this example:
+
+1. Client scans server ports without c-lockd actived
+
+2. When `c-lockd` is working in the server, just the opened ports can be scaned
+
+3. Use `c-lock` with pin
+
+4. The protected ports are now visible fron the client
+
+[![asciicast](https://asciinema.org/a/v3LV7Ss5VaSBvqtWe9VdPVSLV.svg)](https://asciinema.org/a/v3LV7Ss5VaSBvqtWe9VdPVSLV)
+
+### Server
+
+This is the server where the client points:
+
+1. Generates the secret for the pin generation
+
+2. Starts `c-lockd` server opening ports `80` and `5432`, and closing port `22`
+
+3. When the client uses the correct port combination, it opens the protected port for 30 seconds
+
+[![asciicast](https://asciinema.org/a/z6O3qOZFCDDkQhnm3NkICOUYL.svg)](https://asciinema.org/a/z6O3qOZFCDDkQhnm3NkICOUYL)
 
 ## Contributing
 
