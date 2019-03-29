@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-
+import os
 
 def requirements():
     with open('requirements.txt') as f:
@@ -8,12 +8,17 @@ def requirements():
     return [dependency for dependency in raw.split('\n') if len(dependency)]
 
 
+if os.environ.get('CI_COMMIT_TAG'):
+    version = os.environ['CI_COMMIT_TAG']
+else:
+    version = os.environ['CI_JOB_ID']
+
 with open('README.md') as f:
     readme = f.read()
 
 setup(
     name="c-lock",
-    version="0.0.7.1",
+    version=version,
     description="",
     long_description=readme,
     long_description_content_type='text/markdown',
