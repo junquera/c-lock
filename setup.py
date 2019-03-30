@@ -1,12 +1,12 @@
 from setuptools import setup # find_packages
 import os
 
-def requirements():
-    with open('requirements.txt') as f:
-        raw = f.read()
-
-    return [dependency for dependency in raw.split('\n') if len(dependency)]
-
+requirements = [
+    'argparse==1.4.0',
+    'python-iptables==0.13.0',
+    'scapy==2.4.2',
+    'pyqrcode==1.2.1'
+]
 
 if os.environ.get('CI_COMMIT_TAG'):
     version = os.environ['CI_COMMIT_TAG']
@@ -31,7 +31,7 @@ setup(
     packages=["clockngpn", "clockngpn.cli"],
     url="https://gitlab.com/junquera/c-lock",
     license="MIT License",
-    install_requires=requirements(),
+    install_requires=requirements,
     tests_require=["pytest"],
     entry_points=dict(
         console_scripts= [

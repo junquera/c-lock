@@ -1,6 +1,7 @@
 stages:
   - test
   - deploy
+
 # Reading https://docs.gitlab.com/ee/ci/examples/test-and-deploy-python-application-to-heroku.html
 test:
     image: python:3.6
