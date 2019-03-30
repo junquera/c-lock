@@ -7,7 +7,7 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/junquera/c-lock.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/c-lock/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/junquera/c-lock.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/junquera/c-lock/context:python)
 
-A TOTP based port knocking service. Every time slot, it generates a sequence of ports that must be *knocked* (in a correct order) before the final port (it have been designed for protecting a SSH service) becames opened.
+A TOTP based next generation port knocking service. Every time slot, it generates a sequence of ports that must be *knocked* (in a correct order) before the final port (it have been designed for protecting a SSH service) becames opened.
 
 <!-- https://dashboard.moovly.com -->
 
