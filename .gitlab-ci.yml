@@ -19,16 +19,3 @@ pypi:
     - twine upload dist/*
   only:
     - tags
-
-# the 'pages' job will deploy and build your site to the 'public' path
-# pages:
-#   stage: deploy
-#   script:
-#     - apt-get install ruby-full build-essential zlib1g-dev
-#     - gem install jekyll
-#     - jekyll build -d public/
-#   artifacts:
-#     paths:
-#       - public
-#   only:
-#     - master # this job will affect only the 'master' branch

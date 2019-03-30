@@ -2,13 +2,13 @@
 
 Base doc:
 
-- https://github.com/kennethreitz/requests/blob/master/setup.py
+- [ ]  https://github.com/kennethreitz/requests/blob/master/setup.py
 
-  - https://stackoverflow.com/questions/48681816/upload-to-pypi-from-gitlab-pipelines
+  - [x] https://stackoverflow.com/questions/48681816/upload-to-pypi-from-gitlab-pipelines
 
-- https://packaging.python.org/
+- [ ] https://packaging.python.org/
 
-- https://packaging.python.org/guides/distributing-packages-using-setuptools/
+- [ ] https://packaging.python.org/guides/distributing-packages-using-setuptools/
 
 - [ ] Pypi: https://packaging.python.org/guides/distributing-packages-using-setuptools/#data-files
 
