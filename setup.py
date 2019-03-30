@@ -13,7 +13,7 @@ if os.environ.get('CI_COMMIT_TAG'):
 elif os.environ.get('CI_JOB_ID'):
     version = os.environ['CI_JOB_ID']
 else:
-    version = '0.0.7'
+    version = '0.0.7.2'
 
 with open('README.md') as f:
     readme = f.read()
@@ -21,7 +21,7 @@ with open('README.md') as f:
 setup(
     name="c-lock",
     version=version,
-    description="",
+    description="A TOTP based next generation port knocking service.",
     long_description=readme,
     long_description_content_type='text/markdown',
     python_requires=">=3.6",
