@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup # find_packages
 import os
 
 def requirements():
@@ -10,8 +10,10 @@ def requirements():
 
 if os.environ.get('CI_COMMIT_TAG'):
     version = os.environ['CI_COMMIT_TAG']
-else:
+elif os.environ.get('CI_JOB_ID'):
     version = os.environ['CI_JOB_ID']
+else:
+    version = '0.0.7'
 
 with open('README.md') as f:
     readme = f.read()
@@ -26,7 +28,7 @@ setup(
     author="Javier Junquera Sánchez",
     author_email="javier@junquera.xyz",
     # packages=find_packages(),
-    packages=["clockngpn"],
+    packages=["clockngpn", "clockngpn.cli"],
     url="https://gitlab.com/junquera/c-lock",
     license="MIT License",
     install_requires=requirements(),
