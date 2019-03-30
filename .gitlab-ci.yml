@@ -8,7 +8,7 @@ test:
     - pytest
 
 pypi:
-  stage: upload
+  stage: deploy
   image: python:3.6
   variables:
     TWINE_USERNAME: $TWINE_USERNAME
