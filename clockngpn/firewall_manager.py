@@ -37,17 +37,10 @@ class FirewallManager():
         chain.insert_rule(rule, position=len(chain.rules))
 
 
-        # c-lock config
+    def set_secure_mode(self):
+
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "c-lock")
 
-        '''
-        TODO 1b53c7b5-55d7-4834-9719-1ef86a7bfe12
-        if unmanaged_ports:
-            OPEN(unmanaged_ports)
-            DROP_ALL
-        else:
-            DROP (PROTECTED_PORTS)
-        '''
         # Drop all the rest
         rule = iptc.Rule()
         rule.protocol = "tcp"
@@ -72,30 +65,6 @@ class FirewallManager():
         rule.target = iptc.Target(rule, "ACCEPT")
         chain.insert_rule(rule)
 
-        # TODO Not working right
-        # Accept all output connections
-        # rule = iptc.Rule()
-        # rule.protocol = "tcp"
-        # rule.target = iptc.Target(rule, "ACCEPT")
-        # rule.src = "127.0.0.1"
-        # chain.insert_rule(rule)
-    #
-    # def unmanage_port(self, port):
-    #
-    #     table = iptc.Table(iptc.Table.FILTER)
-    #
-    #     chain = iptc.Chain(table, "c-lock-unmanaged")
-    #
-    #     rule = iptc.Rule() # *
-    #     rule.protocol = "tcp"
-    #     match = iptc.Match(rule, "tcp")
-    #     match.dport = "%d" % port
-    #     rule.add_match(match)
-    #
-    #     # TODO Debería ir a INPUT, pero puede hacer un bucle infinito
-    #     rule.target = iptc.Target(rule, "ACCEPT")
-    #
-    #     chain.insert_rule(rule)
 
 
     # if !open then close

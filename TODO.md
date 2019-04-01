@@ -1,5 +1,11 @@
 # TODO
 
+- [ ] Archivo de configuración
+
+- [ ] `-o` excluye `-p` (abrir x y proteger los demás; proteger x y dejar el resto abierto)
+
+- [ ] ¿Es necesario address en PortManager?
+
 - [x] toc-toc-ssh -> c-lock
 
 - [ ] Probrar NFQUEUE y mejorar sistema de puertos (`TODO 1b53c7b5-55d7-4834-9719-1ef86a7bfe12`)
