@@ -3,7 +3,6 @@ from . import totp
 import time
 import threading
 import logging
-import random
 
 log = logging.getLogger(__name__)
 
@@ -15,20 +14,17 @@ def gen_ports_from_pin(pin, n_ports):
 
     values = []
 
-    aux = pin
-
-
     min_port = 2**10 # 1024
     max_port = 2**16 # 65536
 
     for i in range(n_ports):
-        random.seed(aux)
+        aux = totp.hotp(K=pin.to_bytes(3, byteorder='big'), I=i)
+        r = int(aux/1e6) * (max_port - min_port)
 
-        aux = random.randint(min_port, max_port)
-
-        values.append(aux)
+        values.append(aux + r)
 
     return values
+
 
 class PortList():
 
@@ -63,6 +59,7 @@ class PortList():
 
     def reset(self):
         self._actual = 0
+
 
 class TocTocPorts():
 
