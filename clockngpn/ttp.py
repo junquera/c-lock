@@ -20,8 +20,7 @@ def gen_ports_from_pin(pin, n_ports):
     for i in range(n_ports):
         aux = totp.hotp(K=pin.to_bytes(3, byteorder='big'), I=i)
         r = int(((aux/1e6) * (max_port - min_port)) + min_port)
-
-        values.append(aux + r)
+        values.append(r)
 
     return values
 
