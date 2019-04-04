@@ -51,8 +51,8 @@ def otp(secret, moving_factor):
     return int(res)
 
 
-def hotp(K, I):
-    res = otp(K, I) % 1e6
+def hotp(K, I, n=6):
+    res = otp(K, I) % (10**n)
     return int(res)
 
 

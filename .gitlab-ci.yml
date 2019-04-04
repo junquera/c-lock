@@ -1,3 +1,7 @@
+stages:
+  - test
+  - deploy
+
 # Reading https://docs.gitlab.com/ee/ci/examples/test-and-deploy-python-application-to-heroku.html
 test:
     image: python:3.6
@@ -7,15 +11,15 @@ test:
     - pip3 install pytest
     - pytest
 
-# the 'pages' job will deploy and build your site to the 'public' path
-# pages:
-#   stage: deploy
-#   script:
-#     - apt-get install ruby-full build-essential zlib1g-dev
-#     - gem install jekyll
-#     - jekyll build -d public/
-#   artifacts:
-#     paths:
-#       - public
-#   only:
-#     - master # this job will affect only the 'master' branch
+pypi:
+  stage: deploy
+  image: python:3.6
+  variables:
+    TWINE_USERNAME: $TWINE_USERNAME
+    TWINE_PASSWORD: $TWINE_PASSWORD
+  script:
+    - pip install -U twine
+    - python setup.py sdist
+    - twine upload dist/*
+  only:
+    - tags

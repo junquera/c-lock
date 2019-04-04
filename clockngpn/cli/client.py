@@ -1,5 +1,5 @@
-from clock.ttp import TocTocPorts, gen_ports_from_pin
-from clock import totp
+from clockngpn.ttp import TocTocPorts, gen_ports_from_pin
+from clockngpn import totp
 import socket
 import time
 import argparse
@@ -19,7 +19,8 @@ def touch(address, port):
         log.info("Touching %d" % port)
         s.connect((address, port))
         s.close()
-    except Exception as _:
+    except Exception as e:
+        log.debug(e)
         pass
 
 

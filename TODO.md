@@ -8,7 +8,7 @@
 
 - [ ] Travis badge
 
-- [ ] Snyk o pyup
+- [ ] Snyk, pyup y deeptracy
 
 - [ ] En TocTocPorts sólo queremos los puertos actuales
 
@@ -20,19 +20,20 @@
 
   - [ ] Que todo guarde relación con los eventos de ProcWorker
 
-- [ ] Añadir compatibilidad con tokens de Google Authenticator
+- [x] Añadir compatibilidad con tokens de Google Authenticator
 
   - [x] Not use secret to allow pin generation in ttp.gen_ports
 
   - [x] Ver tamaño de clave de Authenticator para generarla igual
 
-  - [ ] Tratar de generar bidi por consola
+  - [x] Tratar de generar bidi por consola
 
-  - [ ] Lock a paquete `common`
 
   - [x] Toc by pin
 
   Cambiado hotp después de recibir valor `totp` por random con semilla
+
+- [ ] Lock a paquete `common`
 
 - [ ] Al capturar error fatal, limpiar las reglas y dejar abierto el puerto de destino
 
