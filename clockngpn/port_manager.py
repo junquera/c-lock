@@ -53,8 +53,8 @@ class PortManager():
                     addr_info['n'] = next_n
                     addr_info['next'] = self._port_list[next_n]
                     self._active[addr] = addr_info
-            else:
-                if port not in self._unmanaged_ports:
+            # Si el puerto no es unmanaged_ports y esta en proteccion global
+            elif port not in self._unmanaged_ports and len(self._unmanaged_ports) > 0:
                     del self._active[addr]
         else:
             if self._port_list[0] == port:

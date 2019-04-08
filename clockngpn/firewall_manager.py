@@ -26,7 +26,6 @@ class FirewallManager():
         except Exception as e:
             log.debug("c-lock exists!")
 
-
         # TODO ¿Debería venir desde ACCEPT?
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         # TODO Añadir que mande aquí todos los puertos protegidos, o todas las conexiones si se protege todo
@@ -35,7 +34,6 @@ class FirewallManager():
         # Apuntar INPUT a c-lock
         rule.target = iptc.Target(rule, "c-lock")
         chain.insert_rule(rule, position=len(chain.rules))
-
 
     def set_secure_mode(self):
 
@@ -64,8 +62,6 @@ class FirewallManager():
         rule.src = "127.0.0.1"
         rule.target = iptc.Target(rule, "ACCEPT")
         chain.insert_rule(rule)
-
-
 
     # if !open then close
     def gen_rule(self, d_port=None, s_address=None, open=True):

@@ -2,6 +2,8 @@
 
 - [ ] Archivo de configuración
 
+- [ ] Bash completion
+
 - [ ] `-o` excluye `-p` (abrir x y proteger los demás; proteger x y dejar el resto abierto)
 
 - [ ] ¿Es necesario address en PortManager?
