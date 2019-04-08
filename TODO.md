@@ -18,7 +18,7 @@
 
 - [ ] Snyk, pyup y deeptracy
 
-- [ ] En TocTocPorts sólo queremos los puertos actuales
+- [x] En TocTocPorts sólo queremos los puertos actuales
 
 - [ ] ¿Centralizar eventos?
 
@@ -35,7 +35,6 @@
   - [x] Ver tamaño de clave de Authenticator para generarla igual
 
   - [x] Tratar de generar bidi por consola
-
 
   - [x] Toc by pin
 
@@ -71,7 +70,7 @@
 
 - [ ] Asegurar cierre (y sobre todo, limpieza de las iptables). Se puede hacer un proceso que compruebe que está corriendo.
 
-  - [ ] Conectar al sniffer para que se pueda cerrar
+  - [x] Conectar al sniffer para que se pueda cerrar
 
 - [ ] Cómo evitar segmentation fault.
 
@@ -87,9 +86,9 @@
 
 - [ ] YAML config
 
-- [ ] Lista de puertos destino
+- [x] Lista de puertos destino
 
-- [ ] Configuración de tiempo de apertura para puertos destino.
+- [x] Configuración de tiempo de apertura para puertos destino.
 
 - [ ] Maqueta de instalador (Makefile, config...)
 
