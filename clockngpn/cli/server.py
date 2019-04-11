@@ -37,7 +37,7 @@ def check_environment():
     ports = Ports that should be protected
     opened = Ports that should be accesible for everybody
 '''
-def main_server(secret, slot, address, ports, opened):
+def main_server(secret, slot, address, protected, opened):
 
     log.debug("Secret: %s" % secret)
 
@@ -55,8 +55,8 @@ def main_server(secret, slot, address, ports, opened):
     fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
 
     # Configure firewall manager for ports or opened
-    if len(ports):
-        for port in ports:
+    if len(protected):
+        for port in protected:
             fwm.close(port)
     else:
         fwm.set_secure_mode()
@@ -67,12 +67,12 @@ def main_server(secret, slot, address, ports, opened):
 
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManager(address, unmanaged_ports=opened)
+    pm = PortManager(address, protected_ports=protected, opened_ports=opened)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
     ttpq = Queue()
     b.add_client(ttpq)
-    ttp = TocTocPorts(secret, destination=ports)
+    ttp = TocTocPorts(secret, destination=protected)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
     fwmw.start()
