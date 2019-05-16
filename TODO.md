@@ -1,5 +1,13 @@
 # TODO
 
+- [ ] Evaluar NFQUEUE
+
+	- https://pypi.org/project/NetfilterQueue/
+
+	- https://gitlab.com/junquera/c-lock/issues/1
+
+	- https://blog.irontec.com/netfilter-nfqueue-firewalling-en-user-space/
+
 - [ ] Archivo de configuración
 
 - [ ] Bash completion
