@@ -33,7 +33,7 @@ class FirewallManager():
         rule.protocol = "tcp"
         # Apuntar INPUT a c-lock
         rule.target = iptc.Target(rule, "c-lock")
-        chain.insert_rule(rule, position=len(chain.rules))
+        chain.insert_rule(rule, position=0) 
 
     def set_secure_mode(self):
 
