@@ -11,12 +11,15 @@ from scapy.all import sniff, IP, TCP
 
 class PortManager():
 
-    def __init__(self, address='0.0.0.0', unmanaged_ports=[]):
+    def __init__(self, address='0.0.0.0', protected_ports=[], opened_ports=[]):
 
         self._sockets = []
         self._threads = []
         self._address = address
-        self._unmanaged_ports = unmanaged_ports
+
+        # TODO Si movemos respuesta a wait_and_listen, movemos esto también
+        self._opened_ports = opened_ports
+        self._protected_ports = protected_ports
 
         try:
 
@@ -40,8 +43,9 @@ class PortManager():
         log.info("nor_wait_nor_listen")
 
     def notify_connection(self, addr, port):
-        # print(addr, port)
+        log.debug("connection from %s:%s" % (addr, port))
         # TODO Hacer esto con métodos con bloqueos (@lock)
+        # TODO Esto tal vez debería ir en otra clase (separar notificación de puertos de gestión de permisos)
         if addr in self._active:
             addr_info = self._active[addr]
             if port == addr_info['next']:
@@ -53,9 +57,9 @@ class PortManager():
                     addr_info['n'] = next_n
                     addr_info['next'] = self._port_list[next_n]
                     self._active[addr] = addr_info
-            else:
-                if port not in self._unmanaged_ports:
-                    del self._active[addr]
+                    # Si el puerto no es unmanaged_ports y esta en modo proteccion global
+            elif port not in self._opened_ports and len(self._protected_ports) <= 0:
+                del self._active[addr]
         else:
             if self._port_list[0] == port:
                 self._active[addr] = dict(next=self._port_list[1], n=1)

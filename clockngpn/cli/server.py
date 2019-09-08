@@ -30,13 +30,14 @@ def check_environment():
 
 
 # TODO Sacar a una clase y hacer el main con arg_parser
-def main_server(secret, slot, address, ports, opened):
-
-    try:
-        check_environment()
-    except Exception as e:
-        log.error(e)
-        exit(-1)
+'''
+    secret = TOTP secret
+    slot = Time slot TOTP generates
+    address =
+    ports = Ports that should be protected
+    opened = Ports that should be accesible for everybody
+'''
+def main_server(secret, slot, address, protected, opened):
 
     log.debug("Secret: %s" % secret)
 
@@ -53,17 +54,25 @@ def main_server(secret, slot, address, ports, opened):
     fwm = FirewallManager()
     fwmw = FirewallManagerWorker(fwmq, bq, fwm=fwm)
 
-    for port in opened:
-        fwm.open(port)
+    # Configure firewall manager for ports or opened
+    if len(protected):
+        for port in protected:
+            fwm.close(port)
+    else:
+        fwm.set_secure_mode()
+        for port in opened:
+            fwm.open(port)
+
+
 
     pmq = Queue()
     b.add_client(pmq)
-    pm = PortManager(address, unmanaged_ports=opened)
+    pm = PortManager(address, protected_ports=protected, opened_ports=opened)
     pmw = PortManagerWorker(pmq, bq, pm=pm)
 
     ttpq = Queue()
     b.add_client(ttpq)
-    ttp = TocTocPorts(secret, destination=ports)
+    ttp = TocTocPorts(secret, destination=protected)
     ttpw = TocTocPortsWorker(ttpq, bq, ttp)
 
     fwmw.start()
@@ -157,6 +166,13 @@ def main():
         print(otp_bidi.generate())
 
     elif args.secret:
+
+        try:
+            check_environment()
+        except Exception as e:
+            log.error(e)
+            exit(-1)
+
         i_secret = args.secret
 
         try:
@@ -168,14 +184,14 @@ def main():
         slot = args.slot
 
         address = args.address
-        ports = args.protected_ports if args.protected_ports else []
 
+        ports = args.protected_ports
         opened = args.opened_ports
 
         main_server(secret, slot, address, ports, opened)
 
-
     else:
+
         log.error("A secret is required to start")
         parser.print_help()
         return

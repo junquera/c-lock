@@ -1,5 +1,21 @@
 # TODO
 
+- [ ] Evaluar NFQUEUE
+
+	- https://pypi.org/project/NetfilterQueue/
+
+	- https://gitlab.com/junquera/c-lock/issues/1
+
+	- https://blog.irontec.com/netfilter-nfqueue-firewalling-en-user-space/
+
+- [ ] Archivo de configuración
+
+- [ ] Bash completion
+
+- [ ] `-o` excluye `-p` (abrir x y proteger los demás; proteger x y dejar el resto abierto)
+
+- [ ] ¿Es necesario address en PortManager?
+
 - [x] toc-toc-ssh -> c-lock
 
 - [ ] Probrar NFQUEUE y mejorar sistema de puertos (`TODO 1b53c7b5-55d7-4834-9719-1ef86a7bfe12`)
@@ -10,7 +26,7 @@
 
 - [ ] Snyk, pyup y deeptracy
 
-- [ ] En TocTocPorts sólo queremos los puertos actuales
+- [x] En TocTocPorts sólo queremos los puertos actuales
 
 - [ ] ¿Centralizar eventos?
 
@@ -27,7 +43,6 @@
   - [x] Ver tamaño de clave de Authenticator para generarla igual
 
   - [x] Tratar de generar bidi por consola
-
 
   - [x] Toc by pin
 
@@ -63,7 +78,7 @@
 
 - [ ] Asegurar cierre (y sobre todo, limpieza de las iptables). Se puede hacer un proceso que compruebe que está corriendo.
 
-  - [ ] Conectar al sniffer para que se pueda cerrar
+  - [x] Conectar al sniffer para que se pueda cerrar
 
 - [ ] Cómo evitar segmentation fault.
 
@@ -79,9 +94,9 @@
 
 - [ ] YAML config
 
-- [ ] Lista de puertos destino
+- [x] Lista de puertos destino
 
-- [ ] Configuración de tiempo de apertura para puertos destino.
+- [x] Configuración de tiempo de apertura para puertos destino.
 
 - [ ] Maqueta de instalador (Makefile, config...)
 

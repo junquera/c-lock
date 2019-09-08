@@ -26,7 +26,6 @@ class FirewallManager():
         except Exception as e:
             log.debug("c-lock exists!")
 
-
         # TODO ¿Debería venir desde ACCEPT?
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "INPUT")
         # TODO Añadir que mande aquí todos los puertos protegidos, o todas las conexiones si se protege todo
@@ -34,20 +33,12 @@ class FirewallManager():
         rule.protocol = "tcp"
         # Apuntar INPUT a c-lock
         rule.target = iptc.Target(rule, "c-lock")
-        chain.insert_rule(rule, position=len(chain.rules))
+        chain.insert_rule(rule, position=0) 
 
+    def set_secure_mode(self):
 
-        # c-lock config
         chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "c-lock")
 
-        '''
-        TODO 1b53c7b5-55d7-4834-9719-1ef86a7bfe12
-        if unmanaged_ports:
-            OPEN(unmanaged_ports)
-            DROP_ALL
-        else:
-            DROP (PROTECTED_PORTS)
-        '''
         # Drop all the rest
         rule = iptc.Rule()
         rule.protocol = "tcp"
@@ -71,32 +62,6 @@ class FirewallManager():
         rule.src = "127.0.0.1"
         rule.target = iptc.Target(rule, "ACCEPT")
         chain.insert_rule(rule)
-
-        # TODO Not working right
-        # Accept all output connections
-        # rule = iptc.Rule()
-        # rule.protocol = "tcp"
-        # rule.target = iptc.Target(rule, "ACCEPT")
-        # rule.src = "127.0.0.1"
-        # chain.insert_rule(rule)
-    #
-    # def unmanage_port(self, port):
-    #
-    #     table = iptc.Table(iptc.Table.FILTER)
-    #
-    #     chain = iptc.Chain(table, "c-lock-unmanaged")
-    #
-    #     rule = iptc.Rule() # *
-    #     rule.protocol = "tcp"
-    #     match = iptc.Match(rule, "tcp")
-    #     match.dport = "%d" % port
-    #     rule.add_match(match)
-    #
-    #     # TODO Debería ir a INPUT, pero puede hacer un bucle infinito
-    #     rule.target = iptc.Target(rule, "ACCEPT")
-    #
-    #     chain.insert_rule(rule)
-
 
     # if !open then close
     def gen_rule(self, d_port=None, s_address=None, open=True):

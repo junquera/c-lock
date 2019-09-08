@@ -19,7 +19,8 @@ def touch(address, port):
         log.info("Touching %d" % port)
         s.connect((address, port))
         s.close()
-    except Exception as _:
+    except Exception as e:
+        log.debug(e)
         pass
 
 
