@@ -43,7 +43,7 @@ class PortManager():
         log.info("nor_wait_nor_listen")
 
     def notify_connection(self, addr, port):
-        # print(addr, port)
+        log.debug("connection from %s:%s" % (addr, port))
         # TODO Hacer esto con métodos con bloqueos (@lock)
         # TODO Esto tal vez debería ir en otra clase (separar notificación de puertos de gestión de permisos)
         if addr in self._active:
