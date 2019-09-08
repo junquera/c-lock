@@ -8,6 +8,8 @@
 
 	- https://blog.irontec.com/netfilter-nfqueue-firewalling-en-user-space/
 
+- [x] Mirror GitLab > GitHub
+
 - [ ] Archivo de configuración
 
 - [ ] Bash completion
